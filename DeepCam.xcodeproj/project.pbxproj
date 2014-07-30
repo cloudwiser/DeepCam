@@ -1,0 +1,393 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		592FF8B918ECBD7600C164F8 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 592FF8B818ECBD7600C164F8 /* Foundation.framework */; };
+		592FF8BB18ECBD7600C164F8 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 592FF8BA18ECBD7600C164F8 /* CoreGraphics.framework */; };
+		592FF90218ECC66200C164F8 /* main.mm in Sources */ = {isa = PBXBuildFile; fileRef = 592FF90118ECC66200C164F8 /* main.mm */; };
+		592FF90618ECCD3B00C164F8 /* jetpac.ntwk in Resources */ = {isa = PBXBuildFile; fileRef = 592FF90518ECCD1E00C164F8 /* jetpac.ntwk */; };
+		592FF90C18EDD0DA00C164F8 /* MainStoryboard_iPad.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 592FF90818EDD0DA00C164F8 /* MainStoryboard_iPad.storyboard */; };
+		592FF90D18EDD0DA00C164F8 /* MainStoryboard_iPhone.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 592FF90A18EDD0DA00C164F8 /* MainStoryboard_iPhone.storyboard */; };
+		592FF92518EE240200C164F8 /* SquareCamAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 592FF92218EE240200C164F8 /* SquareCamAppDelegate.m */; };
+		592FF92618EE240200C164F8 /* SquareCamViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 592FF92418EE240200C164F8 /* SquareCamViewController.m */; };
+		EB2D9E2919883075006B6C9B /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EB2D9E2819883075006B6C9B /* Accelerate.framework */; };
+		EB2D9E2B1988308B006B6C9B /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EB2D9E2A1988308B006B6C9B /* UIKit.framework */; };
+		EBCCB6731988580A009831AA /* DeepBelief.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EBCCB6721988580A009831AA /* DeepBelief.framework */; };
+		EBCCB67919885B09009831AA /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = EBCCB67819885B09009831AA /* Images.xcassets */; };
+		EBCCB67E198871B1009831AA /* wine_bottle_predictor.txt in Resources */ = {isa = PBXBuildFile; fileRef = EBCCB67D198871B1009831AA /* wine_bottle_predictor.txt */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		592FF8B518ECBD7600C164F8 /* DeepCam.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DeepCam.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		592FF8B818ECBD7600C164F8 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		592FF8BA18ECBD7600C164F8 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
+		592FF8D118ECBD7600C164F8 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
+		592FF90118ECC66200C164F8 /* main.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = main.mm; sourceTree = SOURCE_ROOT; };
+		592FF90318ECCB8300C164F8 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = SOURCE_ROOT; };
+		592FF90518ECCD1E00C164F8 /* jetpac.ntwk */ = {isa = PBXFileReference; lastKnownFileType = file; path = jetpac.ntwk; sourceTree = SOURCE_ROOT; };
+		592FF90918EDD0DA00C164F8 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = en; path = MainStoryboard_iPad.storyboard; sourceTree = "<group>"; };
+		592FF90B18EDD0DA00C164F8 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = en; path = MainStoryboard_iPhone.storyboard; sourceTree = "<group>"; };
+		592FF92118EE240200C164F8 /* SquareCamAppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SquareCamAppDelegate.h; sourceTree = SOURCE_ROOT; };
+		592FF92218EE240200C164F8 /* SquareCamAppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SquareCamAppDelegate.m; sourceTree = SOURCE_ROOT; };
+		592FF92318EE240200C164F8 /* SquareCamViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SquareCamViewController.h; sourceTree = SOURCE_ROOT; };
+		592FF92418EE240200C164F8 /* SquareCamViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SquareCamViewController.m; sourceTree = SOURCE_ROOT; };
+		EB2D9E2819883075006B6C9B /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS8.0.sdk/System/Library/Frameworks/Accelerate.framework; sourceTree = DEVELOPER_DIR; };
+		EB2D9E2A1988308B006B6C9B /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS8.0.sdk/System/Library/Frameworks/UIKit.framework; sourceTree = DEVELOPER_DIR; };
+		EBB2337219887E87004A1218 /* DeepCam.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = DeepCam.entitlements; path = DeepCam/DeepCam.entitlements; sourceTree = SOURCE_ROOT; };
+		EBCCB6721988580A009831AA /* DeepBelief.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = DeepBelief.framework; path = "../DeepBeliefSDK-master/iOSLibrary/DeepBelief.framework"; sourceTree = "<group>"; };
+		EBCCB67619885AC3009831AA /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = SOURCE_ROOT; };
+		EBCCB67819885B09009831AA /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = DeepCam/Images.xcassets; sourceTree = SOURCE_ROOT; };
+		EBCCB67D198871B1009831AA /* wine_bottle_predictor.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = wine_bottle_predictor.txt; sourceTree = SOURCE_ROOT; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		592FF8B218ECBD7600C164F8 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EBCCB6731988580A009831AA /* DeepBelief.framework in Frameworks */,
+				EB2D9E2B1988308B006B6C9B /* UIKit.framework in Frameworks */,
+				EB2D9E2919883075006B6C9B /* Accelerate.framework in Frameworks */,
+				592FF8BB18ECBD7600C164F8 /* CoreGraphics.framework in Frameworks */,
+				592FF8B918ECBD7600C164F8 /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		592FF8AA18ECBD3600C164F8 = {
+			isa = PBXGroup;
+			children = (
+				592FF8BE18ECBD7600C164F8 /* DeepCam */,
+				592FF8B718ECBD7600C164F8 /* Frameworks */,
+				592FF8B618ECBD7600C164F8 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		592FF8B618ECBD7600C164F8 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				592FF8B518ECBD7600C164F8 /* DeepCam.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		592FF8B718ECBD7600C164F8 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				EBCCB6721988580A009831AA /* DeepBelief.framework */,
+				EB2D9E2A1988308B006B6C9B /* UIKit.framework */,
+				EB2D9E2819883075006B6C9B /* Accelerate.framework */,
+				592FF8B818ECBD7600C164F8 /* Foundation.framework */,
+				592FF8BA18ECBD7600C164F8 /* CoreGraphics.framework */,
+				592FF8D118ECBD7600C164F8 /* XCTest.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		592FF8BE18ECBD7600C164F8 /* DeepCam */ = {
+			isa = PBXGroup;
+			children = (
+				EBB2337219887E87004A1218 /* DeepCam.entitlements */,
+				592FF90718EDD0DA00C164F8 /* en.lproj */,
+				592FF90118ECC66200C164F8 /* main.mm */,
+				592FF92118EE240200C164F8 /* SquareCamAppDelegate.h */,
+				592FF92218EE240200C164F8 /* SquareCamAppDelegate.m */,
+				592FF92318EE240200C164F8 /* SquareCamViewController.h */,
+				592FF92418EE240200C164F8 /* SquareCamViewController.m */,
+				EBCCB67819885B09009831AA /* Images.xcassets */,
+				EBCCB67A19885D47009831AA /* Supporting Files */,
+			);
+			name = DeepCam;
+			path = SimpleExample;
+			sourceTree = "<group>";
+		};
+		592FF90718EDD0DA00C164F8 /* en.lproj */ = {
+			isa = PBXGroup;
+			children = (
+				592FF90818EDD0DA00C164F8 /* MainStoryboard_iPad.storyboard */,
+				592FF90A18EDD0DA00C164F8 /* MainStoryboard_iPhone.storyboard */,
+			);
+			path = en.lproj;
+			sourceTree = SOURCE_ROOT;
+		};
+		EBCCB67A19885D47009831AA /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				592FF90318ECCB8300C164F8 /* Info.plist */,
+				592FF90518ECCD1E00C164F8 /* jetpac.ntwk */,
+				EBCCB67D198871B1009831AA /* wine_bottle_predictor.txt */,
+				EBCCB67619885AC3009831AA /* README.md */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		EB2D9E2C198834A9006B6C9B /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		592FF8B418ECBD7600C164F8 /* DeepCam */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 592FF8E318ECBD7600C164F8 /* Build configuration list for PBXNativeTarget "DeepCam" */;
+			buildPhases = (
+				592FF8B118ECBD7600C164F8 /* Sources */,
+				592FF8B218ECBD7600C164F8 /* Frameworks */,
+				592FF8B318ECBD7600C164F8 /* Resources */,
+				EB2D9E2C198834A9006B6C9B /* Headers */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = DeepCam;
+			productName = SimpleExample;
+			productReference = 592FF8B518ECBD7600C164F8 /* DeepCam.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		592FF8AB18ECBD3600C164F8 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0600;
+				TargetAttributes = {
+					592FF8B418ECBD7600C164F8 = {
+						DevelopmentTeam = JYXQPVB8H5;
+						SystemCapabilities = {
+							com.apple.iCloud = {
+								enabled = 1;
+							};
+						};
+					};
+				};
+			};
+			buildConfigurationList = 592FF8AE18ECBD3600C164F8 /* Build configuration list for PBXProject "DeepCam" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 592FF8AA18ECBD3600C164F8;
+			productRefGroup = 592FF8B618ECBD7600C164F8 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				592FF8B418ECBD7600C164F8 /* DeepCam */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		592FF8B318ECBD7600C164F8 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				592FF90D18EDD0DA00C164F8 /* MainStoryboard_iPhone.storyboard in Resources */,
+				592FF90C18EDD0DA00C164F8 /* MainStoryboard_iPad.storyboard in Resources */,
+				EBCCB67919885B09009831AA /* Images.xcassets in Resources */,
+				EBCCB67E198871B1009831AA /* wine_bottle_predictor.txt in Resources */,
+				592FF90618ECCD3B00C164F8 /* jetpac.ntwk in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		592FF8B118ECBD7600C164F8 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				592FF90218ECC66200C164F8 /* main.mm in Sources */,
+				592FF92618EE240200C164F8 /* SquareCamViewController.m in Sources */,
+				592FF92518EE240200C164F8 /* SquareCamAppDelegate.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		592FF90818EDD0DA00C164F8 /* MainStoryboard_iPad.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				592FF90918EDD0DA00C164F8 /* en */,
+			);
+			name = MainStoryboard_iPad.storyboard;
+			sourceTree = "<group>";
+		};
+		592FF90A18EDD0DA00C164F8 /* MainStoryboard_iPhone.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				592FF90B18EDD0DA00C164F8 /* en */,
+			);
+			name = MainStoryboard_iPhone.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		592FF8AF18ECBD3600C164F8 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				ONLY_ACTIVE_ARCH = YES;
+			};
+			name = Debug;
+		};
+		592FF8B018ECBD3600C164F8 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+			};
+			name = Release;
+		};
+		592FF8DF18ECBD7600C164F8 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "compiler-default";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = NO;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_ENTITLEMENTS = DeepCam/DeepCam.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+					"\"$(SRCROOT)/../../\"",
+					"/Users/nickhall/Documents/Projects/DeepBeliefSDK-master/iOSLibrary",
+				);
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				INFOPLIST_FILE = "$(SRCROOT)/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				ONLY_ACTIVE_ARCH = NO;
+				"OTHER_LDFLAGS[arch=*]" = "-ObjC";
+				PRODUCT_NAME = DeepCam;
+				PROVISIONING_PROFILE = "";
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALID_ARCHS = "arm64 armv7 armv7s";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Debug;
+		};
+		592FF8E018ECBD7600C164F8 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "compiler-default";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = NO;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_ENTITLEMENTS = DeepCam/DeepCam.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = YES;
+				ENABLE_NS_ASSERTIONS = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+					"\"$(SRCROOT)/../../\"",
+					"/Users/nickhall/Documents/Projects/DeepBeliefSDK-master/iOSLibrary",
+				);
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "";
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				INFOPLIST_FILE = "$(SRCROOT)/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				ONLY_ACTIVE_ARCH = NO;
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = DeepCam;
+				PROVISIONING_PROFILE = "";
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+				VALID_ARCHS = "arm64 armv7 armv7s";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		592FF8AE18ECBD3600C164F8 /* Build configuration list for PBXProject "DeepCam" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				592FF8AF18ECBD3600C164F8 /* Debug */,
+				592FF8B018ECBD3600C164F8 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		592FF8E318ECBD7600C164F8 /* Build configuration list for PBXNativeTarget "DeepCam" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				592FF8DF18ECBD7600C164F8 /* Debug */,
+				592FF8E018ECBD7600C164F8 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 592FF8AB18ECBD3600C164F8 /* Project object */;
+}
