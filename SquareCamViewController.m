@@ -1020,12 +1020,12 @@ bail:
     fprintf(stderr, "------------- SVM File output - copy lines below ------------\n");
     if (!isatty(STDERR_FILENO))
     {
-        // If we're not connected to the XCode console, redirect the output to file...
+        // If we're not debugging to the XCode console, run the predictor with output saved to file...
         FILE *fp = freopen("predout.txt", "w", stderr);
         jpcnn_print_predictor(predictor);
         fclose(fp);
     } else {
-        // ...else print to stderr as usual
+        // ...else run with output to stderr as usual
         jpcnn_print_predictor(predictor);
     }
     fprintf(stderr, "------------- end of SVM File output - copy lines above ------------\n");

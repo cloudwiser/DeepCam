@@ -26,7 +26,6 @@
 		592FF8B518ECBD7600C164F8 /* DeepCam.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DeepCam.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		592FF8B818ECBD7600C164F8 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		592FF8BA18ECBD7600C164F8 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
-		592FF8D118ECBD7600C164F8 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
 		592FF90118ECC66200C164F8 /* main.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = main.mm; sourceTree = SOURCE_ROOT; };
 		592FF90318ECCB8300C164F8 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = SOURCE_ROOT; };
 		592FF90518ECCD1E00C164F8 /* jetpac.ntwk */ = {isa = PBXFileReference; lastKnownFileType = file; path = jetpac.ntwk; sourceTree = SOURCE_ROOT; };
@@ -86,7 +85,6 @@
 				EB2D9E2819883075006B6C9B /* Accelerate.framework */,
 				592FF8B818ECBD7600C164F8 /* Foundation.framework */,
 				592FF8BA18ECBD7600C164F8 /* CoreGraphics.framework */,
-				592FF8D118ECBD7600C164F8 /* XCTest.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -94,7 +92,6 @@
 		592FF8BE18ECBD7600C164F8 /* DeepCam */ = {
 			isa = PBXGroup;
 			children = (
-				EBB2337219887E87004A1218 /* DeepCam.entitlements */,
 				592FF90718EDD0DA00C164F8 /* en.lproj */,
 				592FF90118ECC66200C164F8 /* main.mm */,
 				592FF92118EE240200C164F8 /* SquareCamAppDelegate.h */,
@@ -122,6 +119,7 @@
 			children = (
 				592FF90318ECCB8300C164F8 /* Info.plist */,
 				592FF90518ECCD1E00C164F8 /* jetpac.ntwk */,
+				EBB2337219887E87004A1218 /* DeepCam.entitlements */,
 				EBCCB67D198871B1009831AA /* wine_bottle_predictor.txt */,
 				EBCCB67619885AC3009831AA /* README.md */,
 			);
