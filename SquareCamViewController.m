@@ -53,6 +53,7 @@
 #include <sys/time.h>
 
 #import "DeepBelief/DeepBelief.h"
+#import "DeepCam-Swift.h"
 
 #pragma mark-
 
@@ -97,6 +98,8 @@ static CGContextRef CreateCGBitmapContextForSize(CGSize size)
     CGColorSpaceRelease( colorSpace );
     return context;
 }
+
+static NSString* predictorOutputFilename = @"predictor.txt";
 
 #pragma mark-
 
@@ -664,12 +667,6 @@ bail:
 	isUsingFrontFacingCamera = !isUsingFrontFacingCamera;
 }
 
-- (void)didReceiveMemoryWarning
-{
-    [super didReceiveMemoryWarning];
-    // Release any cached data, images, etc that aren't in use.
-}
-
 #pragma mark - View lifecycle
 
 - (void)viewDidLoad
@@ -678,7 +675,7 @@ bail:
 
     NSString* networkPath = [[NSBundle mainBundle] pathForResource:@"jetpac" ofType:@"ntwk"];
     if (networkPath == NULL) {
-        fprintf(stderr, "Couldn't find the neural network parameters file - did you add it as a resource to your application?\n");
+        NSLog(@"Couldn't find the neural network parameters file - did you add it as a resource to your application?\n");
         assert(false);
     }
     network = jpcnn_create_network([networkPath UTF8String]);
@@ -693,9 +690,7 @@ bail:
     [detectorOptions release];
 
     synth = [[AVSpeechSynthesizer alloc] init];
-
     labelLayers = [[NSMutableArray alloc] init];
-
     oldPredictionValues = [[NSMutableDictionary alloc] init];
 }
 
@@ -726,6 +721,14 @@ bail:
 {
 	[super viewDidDisappear:animated];
 }
+
+- (void)didReceiveMemoryWarning
+{
+    [super didReceiveMemoryWarning];
+    // Release any cached data, images, etc that aren't in use.
+}
+
+#pragma mark - View and input management
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
@@ -773,6 +776,8 @@ bail:
 {
     return YES;
 }
+
+#pragma mark - DeepBelief predictor lifecycle
 
 - (void) setPredictionValues: (NSDictionary*) newValues
 {
@@ -935,17 +940,6 @@ bail:
     [self.predictionTextLayer setString: text];
 }
 
-- (void) speak: (NSString*) words
-{
-    if ([synth isSpeaking]) {
-        return;
-    }
-    AVSpeechUtterance *utterance = [AVSpeechUtterance speechUtteranceWithString: words];
-    utterance.voice = [AVSpeechSynthesisVoice voiceWithLanguage:@"en-US"];
-    utterance.rate = 0.50*AVSpeechUtteranceDefaultSpeechRate;
-    [synth speakUtterance:utterance];
-}
-
 - (void) setupLearning {
     
     negativePredictionsCount = 0;
@@ -1017,18 +1011,11 @@ bail:
         jpcnn_destroy_predictor(predictor);
     }
     predictor = jpcnn_create_predictor_from_trainer(trainer);
-    fprintf(stderr, "------------- SVM File output - copy lines below ------------\n");
-    if (!isatty(STDERR_FILENO))
-    {
-        // If we're not debugging to the XCode console, run the predictor with output saved to file...
-        FILE *fp = freopen("predout.txt", "w", stderr);
-        jpcnn_print_predictor(predictor);
-        fclose(fp);
-    } else {
-        // ...else run with output to stderr as usual
-        jpcnn_print_predictor(predictor);
-    }
-    fprintf(stderr, "------------- end of SVM File output - copy lines above ------------\n");
+    NSLog(@"------------- SVM File output - copy lines below ------------\n");
+
+    [self predictToFile: predictor filename:predictorOutputFilename];
+
+    NSLog(@"------------- end of SVM File output - copy lines above ------------\n");
     predictionState = ePredicting;
     
     [self updateInfoDisplay];
@@ -1038,6 +1025,32 @@ bail:
 
 - (void) restartLearning {
     [self startPositiveLearning];
+}
+
+- (BOOL) predictToFile: (void *) predict filename: (NSString*) predictorFilename {
+    // If we're connected to the console, let the user know before re-routing stderr
+    if (!isatty(STDERR_FILENO)) {
+        NSString* msg = [NSString stringWithFormat:@"Predictor output sent to %@", predictorFilename];
+        NSLog(@"%@", msg);
+    }
+    
+    // redirect stderr (predictor's output) to a file in the app's directory
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory,NSUserDomainMask, YES);
+    NSString *documentsDirectory = [paths objectAtIndex:0];
+    // NSString *fileName =[NSString stringWithFormat:@"%@.log",[NSDate date]];
+    NSString *fileName =[NSString stringWithFormat:@"%@", predictorFilename];
+    NSString *logFilePath = [documentsDirectory stringByAppendingPathComponent:fileName];
+    FILE *fp = freopen([logFilePath cStringUsingEncoding:NSASCIIStringEncoding], "w", stderr);
+    
+    // run the predictor (regardless!)
+    jpcnn_print_predictor(predict);
+    
+    // tidy-up
+    if (fp != nil) {
+        fclose(fp);
+        return YES;
+    } else
+        return NO;
 }
 
 - (void) setupInfoDisplay {
@@ -1105,28 +1118,28 @@ bail:
     
     switch (predictionState) {
         case eWaiting: {
-            [self setInfo: @"When you're ready to teach me, press the button at the bottom and point your phone at the thing you want to recognize."];
+            [self setInfo: @"When you're ready to teach me, press the button at the bottom and point your phone at the thing you want to recognize"];
             [self setProgress: 0.0f];
         } break;
             
         case ePositiveLearning: {
-            [self setInfo: @"Move around the thing you want to recognize, keeping the phone pointed at it, to capture different angles."];
+            [self setInfo: @"Move around the thing you want to recognize, keeping the phone pointed at it, to capture different angles"];
             [self setProgress: (positivePredictionsCount / (float)kPositivePredictionTotal)];
         } break;
             
         case eNegativeWaiting: {
-            [self setInfo: @"Now I need to see examples of things that aren't the object you're looking for. Press the button when you're ready."];
+            [self setInfo: @"Now I need to see examples of things that aren't the object you're looking for. Press the button when you're ready"];
             [self setProgress: 0.0f];
             [self.mainButton setTitle: @"Continue Learning" forState:UIControlStateNormal];
         } break;
             
         case eNegativeLearning: {
-            [self setInfo: @"Now move around the room pointing your phone at lots of things that are not the object you want to recognize."];
+            [self setInfo: @"Now move around the room pointing your phone at lots of things that are not the object you want to recognize"];
             [self setProgress: (negativePredictionsCount / (float)kNegativePredictionTotal)];
         } break;
             
         case ePredicting: {
-            [self setInfo: @"You've taught the neural network to see! Now you should be able to scan around using the camera and detect the object's presence."];
+            [self setInfo: @"You've taught the neural network to see! Now you should be able to scan around using the camera and detect the object's presence"];
             [self.mainButton setTitle: @"Learn Again" forState:UIControlStateNormal];
         } break;
             
@@ -1203,6 +1216,8 @@ bail:
     [self updateInfoDisplay];
 }
 
+#pragma mark - Sound and speech helpers
+
 - (void) setupSound {
     // Create the URL for the source audio file. The URLForResource:withExtension: method is
     //    new in iOS 4.0.
@@ -1216,5 +1231,17 @@ bail:
                                       &_soundFileObject
                                       );
 }
+
+- (void) speak: (NSString*) words
+{
+    if ([synth isSpeaking]) {
+        return;
+    }
+    AVSpeechUtterance *utterance = [AVSpeechUtterance speechUtteranceWithString: words];
+    utterance.voice = [AVSpeechSynthesisVoice voiceWithLanguage:@"en-US"];
+    utterance.rate = 0.50 * AVSpeechUtteranceDefaultSpeechRate;
+    [synth speakUtterance:utterance];
+}
+
 
 @end
