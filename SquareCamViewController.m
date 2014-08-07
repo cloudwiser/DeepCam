@@ -1035,7 +1035,7 @@ bail:
     }
     
     // redirect stderr (predictor's output) to a file in the app's directory
-    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory,NSUserDomainMask, YES);
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
     NSString *documentsDirectory = [paths objectAtIndex:0];
     // NSString *fileName =[NSString stringWithFormat:@"%@.log",[NSDate date]];
     NSString *fileName =[NSString stringWithFormat:@"%@", predictorFilename];
