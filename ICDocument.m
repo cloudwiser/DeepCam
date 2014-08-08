@@ -44,4 +44,61 @@
     
 }
 
+/*
+- (void)moveFileToiCloud:(FileRepresentation *)fileToMove {
+    NSURL *sourceURL = fileToMove.url;
+    NSString *destinationFileName = fileToMove.fileName;
+    NSURL *destinationURL = [self.documentsDir URLByAppendingPathComponent:destinationFileName];
+    
+    dispatch_queue_t q_default;
+    q_default = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+    dispatch_async(q_default, ^(void) {
+        NSFileManager *fileManager = [[[NSFileManager alloc] init] autorelease];
+        NSError *error = nil;
+        BOOL success = [fileManager setUbiquitous:YES itemAtURL:sourceURL
+                                   destinationURL:destinationURL error:&error];
+        dispatch_queue_t q_main = dispatch_get_main_queue();
+        dispatch_async(q_main, ^(void) {
+            if (success) {
+                FileRepresentation *fileRepresentation = [[FileRepresentation alloc]
+                                                          initWithFileName:fileToMove.fileName url:destinationURL];
+                [_fileList removeObject:fileToMove];
+                [_fileList addObject:fileRepresentation];
+                NSLog(@"moved file to cloud: %@", fileRepresentation);
+            }
+            if (!success) {
+                NSLog(@"Couldn't move file to iCloud: %@", fileToMove);
+            }
+        });
+    });
+}
+
+- (void)moveFileToLocal:(FileRepresentation *)fileToMove {
+    NSURL *sourceURL = fileToMove.url;
+    NSString *destinationFileName = fileToMove.fileName;
+    NSURL *destinationURL = [self.documentsDir URLByAppendingPathComponent:destinationFileName];
+    
+    dispatch_queue_t q_default;
+    q_default = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+    dispatch_async(q_default, ^(void) {
+        NSFileManager *fileManager = [[[NSFileManager alloc] init] autorelease];
+        NSError *error = nil;
+        BOOL success = [fileManager setUbiquitous:NO itemAtURL:sourceURL destinationURL:destinationURL
+                                            error:&error];
+        dispatch_queue_t q_main = dispatch_get_main_queue();
+        dispatch_async(q_main, ^(void) {
+            if (success) {
+                FileRepresentation *fileRepresentation = [[FileRepresentation alloc]
+                                                          initWithFileName:fileToMove.fileName url:destinationURL];
+                [_fileList removeObject:fileToMove];
+                [_fileList addObject:fileRepresentation];
+                NSLog(@"moved file to local storage: %@", fileRepresentation);
+            }
+            if (!success) {
+                NSLog(@"Couldn't move file to local storage: %@", fileToMove);
+            }
+        });
+    });
+}
+*/
 @end
