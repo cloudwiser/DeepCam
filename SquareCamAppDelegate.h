@@ -46,9 +46,14 @@
  */
 
 #import <UIKit/UIKit.h>
+#import "ICDocument.h"
 
 @interface SquareCamAppDelegate : UIResponder <UIApplicationDelegate>
 
 @property (strong, nonatomic) UIWindow *window;
+@property (strong) ICDocument * doc;
+@property (strong) NSMetadataQuery *query;
+
+- (void)loadDocument;
 
 @end

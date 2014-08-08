@@ -53,7 +53,8 @@
 #include <sys/time.h>
 
 #import "DeepBelief/DeepBelief.h"
-#import "DeepCam-Swift.h"
+#import "ICDocument.h"
+// #import "DeepCam-Swift.h"
 
 #pragma mark-
 
@@ -99,7 +100,7 @@ static CGContextRef CreateCGBitmapContextForSize(CGSize size)
     return context;
 }
 
-static NSString* predictorOutputFilename = @"predictor.txt";
+// static NSString* predictorOutputFilename = @"predictor.txt";
 
 #pragma mark-
 
@@ -1013,7 +1014,7 @@ bail:
     predictor = jpcnn_create_predictor_from_trainer(trainer);
     NSLog(@"------------- SVM File output - copy lines below ------------\n");
 
-    [self predictToFile: predictor filename:predictorOutputFilename];
+    [self predictToFile: predictor filename:kcloudFilename];
 
     NSLog(@"------------- end of SVM File output - copy lines above ------------\n");
     predictionState = ePredicting;

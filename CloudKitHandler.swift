@@ -12,7 +12,7 @@ import CloudKit
 
 let kPredictorRecordType = "predictor"
 
-func loadData(query: NSMetadataQuery) -> UIDocument
+func oldloadData(query: NSMetadataQuery) -> UIDocument
 {
     var doc: UIDocument
     
@@ -58,7 +58,7 @@ func loadData(query: NSMetadataQuery) -> UIDocument
     return doc
 }
 
-func queryDidFinishGathering(notification: NSNotification)
+func oldqueryDidFinishGathering(notification: NSNotification)
 {
     // (3) if Query is finished, this will send the result (i.e. either it found our text.dat or it didn't) to the next function
     let query = notification.object as NSMetadataQuery
@@ -70,13 +70,13 @@ func queryDidFinishGathering(notification: NSNotification)
     NSNotificationCenter.defaultCenter().removeObserver(nil, name:NSMetadataQueryDidFinishGatheringNotification, object:query)
 }
 
-func loadDocument()
+func oldloadDocument()
 {
     // (2) iCloud query: Looks if there exists a file called text.txt in the cloud
 
     var query = NSMetadataQuery()
     //SCOPE
-    query.searchScopes.append(NSMetadataQueryUbiquitousDocumentsScope)
+    // query.searchScopes.append(NSMetadataQueryUbiquitousDocumentsScope)
     //PREDICATE
     var pred = NSPredicate(format: "%K == %@", argumentArray: [NSMetadataItemFSNameKey, "text.txt"])
     query.predicate = pred
