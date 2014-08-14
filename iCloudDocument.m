@@ -1,5 +1,5 @@
 //
-//  ICDocument.m
+//  iCloudDocument.m
 //  DeepCam
 //
 //  Created by nichall on 08/08/2014.
@@ -7,9 +7,9 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "ICDocument.h"
+#import "iCloudDocument.h"
 
-@implementation ICDocument
+@implementation iCloudDocument
 
 @synthesize fileContent;
 
@@ -44,8 +44,10 @@
     
 }
 
-/*
-- (void)moveFileToiCloud:(FileRepresentation *)fileToMove {
+/* also see 
+    http://stackoverflow.com/questions/20592884/copy-file-to-icloud-without-having-to-remove-the-local-file?rq=1
+
+ - (void)moveFileToiCloud:(FileRepresentation *)fileToMove {
     NSURL *sourceURL = fileToMove.url;
     NSString *destinationFileName = fileToMove.fileName;
     NSURL *destinationURL = [self.documentsDir URLByAppendingPathComponent:destinationFileName];

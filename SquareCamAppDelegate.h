@@ -46,12 +46,12 @@
  */
 
 #import <UIKit/UIKit.h>
-#import "ICDocument.h"
+#import "iCloudDocument.h"
 
 @interface SquareCamAppDelegate : UIResponder <UIApplicationDelegate>
 
 @property (strong, nonatomic) UIWindow *window;
-@property (strong) ICDocument * doc;
+@property (strong) iCloudDocument * doc;
 @property (strong) NSMetadataQuery *query;
 
 - (void)loadDocument;

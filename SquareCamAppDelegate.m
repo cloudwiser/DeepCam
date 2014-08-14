@@ -144,7 +144,7 @@
         
         NSMetadataItem *item = [query resultAtIndex:0];
         NSURL *url = [item valueForAttribute:NSMetadataItemURLKey];
-        ICDocument *doc = [[ICDocument alloc] initWithFileURL:url];
+        iCloudDocument *doc = [[iCloudDocument alloc] initWithFileURL:url];
         self.doc = doc;
         [self.doc openWithCompletionHandler:^(BOOL success) {
             if (success) {
@@ -162,7 +162,7 @@
         NSURL *ubiquitousPackage = [[ubiq URLByAppendingPathComponent:
                                      @"Documents"] URLByAppendingPathComponent:kcloudFilename];
         
-        ICDocument *doc = [[ICDocument alloc] initWithFileURL:ubiquitousPackage];
+        iCloudDocument *doc = [[iCloudDocument alloc] initWithFileURL:ubiquitousPackage];
         self.doc = doc;
         
         [doc saveToURL:[doc fileURL]

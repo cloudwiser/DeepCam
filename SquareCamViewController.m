@@ -53,7 +53,7 @@
 #include <sys/time.h>
 
 #import "DeepBelief/DeepBelief.h"
-#import "ICDocument.h"
+#import "iCloudDocument.h"
 // #import "DeepCam-Swift.h"
 
 #pragma mark-
@@ -1053,6 +1053,24 @@ bail:
     } else
         return NO;
 }
+
+// NSArray *paths = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES);
+// NSString *documentsDirectory = [paths objectAtIndex:0];
+// NSString *fileName =[NSString stringWithFormat:@"%@", predictorFilename];
+//
+// NSURL *ubiquityURL = [[NSFileManager defaultManager] URLForUbiquityContainerIdentifier:nil];
+// NSError *error = nil;
+// NSString *writableDBPath = [documentsDirectory stringByAppendingPathComponent:fileName];
+// NSURL *fromURL = [NSURL URLWithString:writableDBPath];
+// dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+//      BOOL success = [fileManager  setUbiquitous:YES itemAtURL:fromURL destinationURL:ubiquityURL error:&error];
+//      if (success) {
+//          NSLog(@"Moved file to iCloud: %@", fileName);
+//      }
+//      else {
+//          NSLog(@"Move file to iCloud failed: %@ : error: %@", fileName, error);
+//      }
+// });
 
 - (void) setupInfoDisplay {
     NSString* const font = @"Menlo-Regular";
