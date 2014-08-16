@@ -65,7 +65,7 @@
     if (ubiq) {
         NSLog(@"iCloud access at %@", ubiq);
         // Load document...
-        [self loadDocument];
+        // [self loadDocument];
     } else {
         NSLog(@"No iCloud access");
     }
