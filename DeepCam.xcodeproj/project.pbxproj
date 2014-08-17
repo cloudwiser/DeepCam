@@ -15,6 +15,7 @@
 		592FF90D18EDD0DA00C164F8 /* MainStoryboard_iPhone.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 592FF90A18EDD0DA00C164F8 /* MainStoryboard_iPhone.storyboard */; };
 		592FF92518EE240200C164F8 /* SquareCamAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 592FF92218EE240200C164F8 /* SquareCamAppDelegate.m */; };
 		592FF92618EE240200C164F8 /* SquareCamViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 592FF92418EE240200C164F8 /* SquareCamViewController.m */; };
+		EB285CB7199FF0DA00C3DABD /* Settings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = EB285CB6199FF0DA00C3DABD /* Settings.bundle */; };
 		EB2D9E2919883075006B6C9B /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EB2D9E2819883075006B6C9B /* Accelerate.framework */; };
 		EB2D9E2B1988308B006B6C9B /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EB2D9E2A1988308B006B6C9B /* UIKit.framework */; };
 		EB47914D1995267D0040A901 /* iCloudDocument.m in Sources */ = {isa = PBXBuildFile; fileRef = EB47914C1995267D0040A901 /* iCloudDocument.m */; };
@@ -37,6 +38,7 @@
 		592FF92218EE240200C164F8 /* SquareCamAppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SquareCamAppDelegate.m; sourceTree = SOURCE_ROOT; };
 		592FF92318EE240200C164F8 /* SquareCamViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SquareCamViewController.h; sourceTree = SOURCE_ROOT; };
 		592FF92418EE240200C164F8 /* SquareCamViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SquareCamViewController.m; sourceTree = SOURCE_ROOT; };
+		EB285CB6199FF0DA00C3DABD /* Settings.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = Settings.bundle; sourceTree = SOURCE_ROOT; };
 		EB2D9E2819883075006B6C9B /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS8.0.sdk/System/Library/Frameworks/Accelerate.framework; sourceTree = DEVELOPER_DIR; };
 		EB2D9E2A1988308B006B6C9B /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS8.0.sdk/System/Library/Frameworks/UIKit.framework; sourceTree = DEVELOPER_DIR; };
 		EB47914C1995267D0040A901 /* iCloudDocument.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iCloudDocument.m; sourceTree = SOURCE_ROOT; };
@@ -128,6 +130,7 @@
 				592FF90318ECCB8300C164F8 /* Info.plist */,
 				592FF90518ECCD1E00C164F8 /* jetpac.ntwk */,
 				EBB2337219887E87004A1218 /* DeepCam.entitlements */,
+				EB285CB6199FF0DA00C3DABD /* Settings.bundle */,
 				EBCCB67D198871B1009831AA /* wine_bottle_predictor.txt */,
 				EBCCB67619885AC3009831AA /* README.md */,
 			);
@@ -209,6 +212,7 @@
 				592FF90C18EDD0DA00C164F8 /* MainStoryboard_iPad.storyboard in Resources */,
 				EBCCB67919885B09009831AA /* Images.xcassets in Resources */,
 				EBCCB67E198871B1009831AA /* wine_bottle_predictor.txt in Resources */,
+				EB285CB7199FF0DA00C3DABD /* Settings.bundle in Resources */,
 				592FF90618ECCD3B00C164F8 /* jetpac.ntwk in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

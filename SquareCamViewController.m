@@ -392,7 +392,7 @@ bail:
 {
     switch (predictionState) {
         case eWaiting: {
-            [sender setTitle: @"Learning" forState:UIControlStateNormal];
+            [sender setTitle: @"Learning..." forState:UIControlStateNormal];
             [self triggerNextState];
         } break;
             
@@ -401,7 +401,7 @@ bail:
         } break;
             
         case eNegativeWaiting: {
-            [sender setTitle: @"Learning" forState:UIControlStateNormal];
+            [sender setTitle: @"Learning..." forState:UIControlStateNormal];
             [self triggerNextState];
         } break;
             
@@ -867,7 +867,7 @@ bail:
                           alignment:kCAAlignmentLeft];
 
         if ((labelCount == 0) && (value > 0.5f)) {
-            [self speak: [label capitalizedString]];
+            if ([[NSUserDefaults standardUserDefaults] boolForKey:@"useSpeech"])                [self speak: [label capitalizedString]];
         }
 
         labelCount += 1;
@@ -888,7 +888,7 @@ bail:
 - (void) addLabelLayerWithText: (NSString*) text originX:(float) originX originY:(float) originY
   width:(float) width height:(float) height alignment:(NSString*) alignment
 {
-    NSString* const font = @"Menlo-Regular";
+    NSString* const font = @"HelveticaNeue";
     const float fontSize = 20.0f;
 
     const float marginSizeX = 5.0f;
@@ -1012,12 +1012,9 @@ bail:
         jpcnn_destroy_predictor(predictor);
     }
     predictor = jpcnn_create_predictor_from_trainer(trainer);
-    NSLog(@"------------- SVM File output - copy lines below ------------\n");
 
-    // [self writePredictFileToLocal: predictor filename:kcloudFilename];
     [self writePredictFileToCloud: predictor filename:kcloudFilename];
     
-    NSLog(@"------------- end of SVM File output - copy lines above ------------\n");
     predictionState = ePredicting;
     
     [self updateInfoDisplay];
@@ -1030,10 +1027,9 @@ bail:
 }
 
 - (BOOL) writePredictFileToLocal: (void *) predict filename: (NSString*) predictorFilename {
-    // If we're connected to the console, let the user know before re-routing stderr
-    if (!isatty(STDERR_FILENO)) {
-        NSString* msg = [NSString stringWithFormat:@"Predictor output sent to %@", predictorFilename];
-        NSLog(@"%@", msg);
+    // If we're connected to the console, warn the user know before re-routing stderr
+    if (isatty(STDERR_FILENO)) {
+        NSLog(@"Predictor output will be re-directed to file");
     }
     
     // setup a local file in the app's directory
@@ -1065,10 +1061,9 @@ bail:
 }
 
 - (BOOL) writePredictFileToCloud: (void *) predict filename: (NSString*) predictorFilename {
-    // If we're connected to the console, let the user know before re-routing stderr
-    if (!isatty(STDERR_FILENO)) {
-        NSString* msg = [NSString stringWithFormat:@"Predictor output will be sent to %@", predictorFilename];
-        NSLog(@"%@", msg);
+    // If we're connected to the console, warn the user know before re-routing stderr
+    if (isatty(STDERR_FILENO)) {
+        NSLog(@"Predictor output will be re-directed to file");
     }
     
     // setup a local file in the app's directory
@@ -1103,18 +1098,17 @@ bail:
 
         // ...and move local file to app's area on iCloud
         __block BOOL wasMoved = NO;
-        dispatch_queue_t q_default = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
-        dispatch_async(q_default, ^(void) {
-            NSURL *fromURL = [NSURL URLWithString:writableDBPath];
+        dispatch_async (dispatch_get_global_queue (DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
+            NSURL *sourceURL = [NSURL URLWithString:writableDBPath];
             NSFileManager *fileManager = [[[NSFileManager alloc] init] autorelease];
-            NSURL *ubiquityURL = [[fileManager URLForUbiquityContainerIdentifier:nil] URLByAppendingPathComponent:@"Documents" isDirectory:YES];
-            ubiquityURL = [ubiquityURL URLByAppendingPathComponent:fileName];
+            NSURL *destURL = [[fileManager URLForUbiquityContainerIdentifier:nil] URLByAppendingPathComponent:@"Documents" isDirectory:YES];
+            destURL = [destURL URLByAppendingPathComponent:fileName];
             NSError *error = nil;
-            BOOL success = [fileManager setUbiquitous:YES itemAtURL:fromURL destinationURL:ubiquityURL error:&error];
+            BOOL success = [fileManager setUbiquitous:YES itemAtURL:sourceURL destinationURL:destURL error:&error];
             if (success) {
-                NSLog(@"Moved file to iCloud: %@", fileName);
+                NSLog(@"Moved file to iCloud @ %@", destURL);
             } else {
-                NSLog(@"Move file to iCloud failed: %@ : error: %@", fileName, error);
+                NSLog(@"Move file to iCloud failed @ %@ : error: %@", destURL, error);
             }
             wasMoved = success;
         });
@@ -1125,7 +1119,7 @@ bail:
 }
 
 - (void) setupInfoDisplay {
-    NSString* const font = @"Menlo-Regular";
+    NSString* const font = @"HelveticaNeue";
     const float fontSize = 20.0f;
     
     const float viewWidth = 320.0f;
@@ -1224,7 +1218,10 @@ bail:
 - (void) setInfo: (NSString*) info {
     if (![info isEqualToString: lastInfo]) {
         [self.infoForeground setString: info];
-        [self speak: info];
+        
+        if ([[NSUserDefaults standardUserDefaults] boolForKey:@"useSpeech"])
+            [self speak: info];
+        
         lastInfo = info;
     }
 }

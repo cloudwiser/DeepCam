@@ -59,17 +59,19 @@
     // Override point for customization after application launch.
     [self.window makeKeyAndVisible];
     
-    NSURL *ubiq = [[NSFileManager defaultManager]
-                   URLForUbiquityContainerIdentifier:nil];
-   
-    if (ubiq) {
-        NSLog(@"iCloud access at %@", ubiq);
-        // Load document...
-        // [self loadDocument];
-    } else {
-        NSLog(@"No iCloud access");
-    }
-    
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        NSURL *iCloudRoot = [[NSFileManager defaultManager] URLForUbiquityContainerIdentifier:nil];
+        if (iCloudRoot != nil) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                NSLog(@"iCloud available at: %@", iCloudRoot);
+            });
+        }
+        else {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                NSLog(@"iCloud not available");
+            });
+        }
+    });
     return YES;
 }
 
