@@ -1013,7 +1013,7 @@ bail:
     }
     predictor = jpcnn_create_predictor_from_trainer(trainer);
 
-    [self writePredictFileToCloud: predictor filename:kcloudFilename];
+    [self writePredictorFileToCloud: predictor filename:kcloudFilename];
     
     predictionState = ePredicting;
     
@@ -1026,51 +1026,17 @@ bail:
     [self startPositiveLearning];
 }
 
-- (BOOL) writePredictFileToLocal: (void *) predict filename: (NSString*) predictorFilename {
-    // If we're connected to the console, warn the user know before re-routing stderr
+- (BOOL) writePredictorFileToCloud: (void *) predict filename: (NSString*) predictorFilename {
+    // If we're connected to the console, warn the user before re-routing stderr
     if (isatty(STDERR_FILENO)) {
         NSLog(@"Predictor output will be re-directed to file");
     }
     
-    // setup a local file in the app's directory
-    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-    NSString *documentsDirectory = [paths objectAtIndex:0];
-    // NSString *fileName =[NSString stringWithFormat:@"%@.log",[NSDate date]];
-    NSString *fileName =[NSString stringWithFormat:@"%@", predictorFilename];
-    NSString *logFilePath = [documentsDirectory stringByAppendingPathComponent:fileName];
-    
-    // redirect stderr (predictor's output) to a file in the app's directory
-    int savedStdErr = dup(STDERR_FILENO);
-    FILE *fp = freopen([logFilePath cStringUsingEncoding:NSASCIIStringEncoding], "w", stderr);
-    
-    // output the predictor
-    jpcnn_print_predictor(predict);
-    
-    // redirect stderr back to original path
-    fflush(stderr);
-    dup2(savedStdErr, STDERR_FILENO);
-    close(savedStdErr);
-
-    // new file created?
-    if (fp != nil) {
-        // tidy up...
-        fclose(fp);
-        return YES;
-    } else
-        return NO;
-}
-
-- (BOOL) writePredictFileToCloud: (void *) predict filename: (NSString*) predictorFilename {
-    // If we're connected to the console, warn the user know before re-routing stderr
-    if (isatty(STDERR_FILENO)) {
-        NSLog(@"Predictor output will be re-directed to file");
-    }
-    
-    // setup a local file in the app's directory
+    // get the local Documents directory path
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
     NSString *documentsDirectory = [paths objectAtIndex:0];
     
-    // set up a unique-ish filename
+    // set up a unique-ish file
     NSDate *time = [NSDate date];
     NSDateFormatter* df = [NSDateFormatter new];
     [df setDateFormat:@"dd-MM-yyyy-hh-mm-ss"];
@@ -1079,24 +1045,24 @@ bail:
     // NSString *fileName =[NSString stringWithFormat:@"%@", predictorFilename];
     NSString *writableDBPath = [documentsDirectory stringByAppendingPathComponent:fileName];
 
-    // redirect stderr (predictor's output) to the file in the app's directory
+    // redirect stderr (predictor's output) to this file
     int savedStdErr = dup(STDERR_FILENO);
     FILE *fp = freopen([writableDBPath cStringUsingEncoding:NSASCIIStringEncoding], "w", stderr);
     
     // output the predictor
     jpcnn_print_predictor(predict);
 
-    // redirect stderr back to original path
+    // redirect stderr back to the original path
     fflush(stderr);
     dup2(savedStdErr, STDERR_FILENO);
     close(savedStdErr);
     
-    // new file created?
+    // new local file created?
     if (fp != nil) {
-        // tidy up...
+        // if so, tidy up...
         fclose(fp);
 
-        // ...and move local file to app's area on iCloud
+        // ...and move it to the app's container on iCloud
         __block BOOL wasMoved = NO;
         dispatch_async (dispatch_get_global_queue (DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
             NSURL *sourceURL = [NSURL URLWithString:writableDBPath];
@@ -1106,9 +1072,9 @@ bail:
             NSError *error = nil;
             BOOL success = [fileManager setUbiquitous:YES itemAtURL:sourceURL destinationURL:destURL error:&error];
             if (success) {
-                NSLog(@"Moved file to iCloud @ %@", destURL);
+                NSLog(@"Move to iCloud for file: %@", destURL);
             } else {
-                NSLog(@"Move file to iCloud failed @ %@ : error: %@", destURL, error);
+                NSLog(@"Move to iCloud for file: %@ : failed - error: %@", destURL, error);
             }
             wasMoved = success;
         });
@@ -1116,6 +1082,36 @@ bail:
     } else {
         return NO;
     }
+}
+
+- (BOOL) readPredictorFileFromCloud: (NSString*) predictorFilename {
+    // get the local Documents directory path
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *documentsDirectory = [paths objectAtIndex:0];
+    NSString *writableDBPath = [documentsDirectory stringByAppendingPathComponent:predictorFilename];
+    
+    // ...and move file from the app's container on iCloud
+    __block BOOL wasMoved = NO;
+    dispatch_async (dispatch_get_global_queue (DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
+        NSURL *destURL = [NSURL URLWithString:writableDBPath];
+        NSFileManager *fileManager = [[[NSFileManager alloc] init] autorelease];
+        NSURL *sourceURL = [[fileManager URLForUbiquityContainerIdentifier:nil] URLByAppendingPathComponent:@"Documents" isDirectory:YES];
+        sourceURL = [sourceURL URLByAppendingPathComponent:predictorFilename];
+        NSError *error = nil;
+        BOOL success = [fileManager setUbiquitous:NO itemAtURL:sourceURL destinationURL:destURL error:&error];
+        if (success) {
+            NSLog(@"Move from iCloud for file: %@", destURL);
+            
+            // now load the predictor from the local file
+            predictor = jpcnn_load_predictor([writableDBPath UTF8String]);
+            assert(predictor != NULL);
+            
+        } else {
+            NSLog(@"Move from iCloud for file: %@ : failed - error: %@", destURL, error);
+        }
+        wasMoved = success;
+    });
+    return wasMoved;
 }
 
 - (void) setupInfoDisplay {

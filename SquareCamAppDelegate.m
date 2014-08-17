@@ -59,18 +59,15 @@
     // Override point for customization after application launch.
     [self.window makeKeyAndVisible];
     
+    // Check to see if iCloud is available
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         NSURL *iCloudRoot = [[NSFileManager defaultManager] URLForUbiquityContainerIdentifier:nil];
-        if (iCloudRoot != nil) {
-            dispatch_async(dispatch_get_main_queue(), ^{
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if (iCloudRoot != nil)
                 NSLog(@"iCloud available at: %@", iCloudRoot);
-            });
-        }
-        else {
-            dispatch_async(dispatch_get_main_queue(), ^{
+            else
                 NSLog(@"iCloud not available");
-            });
-        }
+        });
     });
     return YES;
 }

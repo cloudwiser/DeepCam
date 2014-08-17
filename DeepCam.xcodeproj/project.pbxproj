@@ -19,7 +19,6 @@
 		EB2D9E2919883075006B6C9B /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EB2D9E2819883075006B6C9B /* Accelerate.framework */; };
 		EB2D9E2B1988308B006B6C9B /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EB2D9E2A1988308B006B6C9B /* UIKit.framework */; };
 		EB47914D1995267D0040A901 /* iCloudDocument.m in Sources */ = {isa = PBXBuildFile; fileRef = EB47914C1995267D0040A901 /* iCloudDocument.m */; };
-		EB925C41199520E100C1B67F /* iCloudDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB925C40199520E100C1B67F /* iCloudDocument.swift */; };
 		EBCCB6731988580A009831AA /* DeepBelief.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EBCCB6721988580A009831AA /* DeepBelief.framework */; };
 		EBCCB67919885B09009831AA /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = EBCCB67819885B09009831AA /* Images.xcassets */; };
 		EBCCB67E198871B1009831AA /* wine_bottle_predictor.txt in Resources */ = {isa = PBXBuildFile; fileRef = EBCCB67D198871B1009831AA /* wine_bottle_predictor.txt */; };
@@ -43,7 +42,6 @@
 		EB2D9E2A1988308B006B6C9B /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS8.0.sdk/System/Library/Frameworks/UIKit.framework; sourceTree = DEVELOPER_DIR; };
 		EB47914C1995267D0040A901 /* iCloudDocument.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iCloudDocument.m; sourceTree = SOURCE_ROOT; };
 		EB47914E1995269B0040A901 /* iCloudDocument.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = iCloudDocument.h; sourceTree = SOURCE_ROOT; };
-		EB925C40199520E100C1B67F /* iCloudDocument.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = iCloudDocument.swift; sourceTree = SOURCE_ROOT; };
 		EBB2337219887E87004A1218 /* DeepCam.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = DeepCam.entitlements; path = DeepCam/DeepCam.entitlements; sourceTree = SOURCE_ROOT; };
 		EBCCB6721988580A009831AA /* DeepBelief.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = DeepBelief.framework; path = "../DeepBeliefSDK-master/iOSLibrary/DeepBelief.framework"; sourceTree = "<group>"; };
 		EBCCB67619885AC3009831AA /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = SOURCE_ROOT; };
@@ -107,7 +105,6 @@
 				592FF92418EE240200C164F8 /* SquareCamViewController.m */,
 				EB47914E1995269B0040A901 /* iCloudDocument.h */,
 				EB47914C1995267D0040A901 /* iCloudDocument.m */,
-				EB925C40199520E100C1B67F /* iCloudDocument.swift */,
 				EBCCB67819885B09009831AA /* Images.xcassets */,
 				EBCCB67A19885D47009831AA /* Supporting Files */,
 			);
@@ -227,7 +224,6 @@
 				EB47914D1995267D0040A901 /* iCloudDocument.m in Sources */,
 				592FF90218ECC66200C164F8 /* main.mm in Sources */,
 				592FF92618EE240200C164F8 /* SquareCamViewController.m in Sources */,
-				EB925C41199520E100C1B67F /* iCloudDocument.swift in Sources */,
 				592FF92518EE240200C164F8 /* SquareCamAppDelegate.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
