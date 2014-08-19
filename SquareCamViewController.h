@@ -92,6 +92,8 @@
 @property (readonly)    SystemSoundID   soundFileObject;
 @property (retain, nonatomic) NSDate *lastFrameTime;
 
+@property (strong) NSMetadataQuery *fileDownloadMonitorQuery;
+
 - (IBAction)takePicture:(id)sender;
 - (IBAction)switchCameras:(id)sender;
 - (IBAction)handlePinchGesture:(UIGestureRecognizer *)sender;

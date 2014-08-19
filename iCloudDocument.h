@@ -11,7 +11,7 @@
 #ifndef DeepCam_iCloudDocument_h
 #define DeepCam_iCloudDocument_h
 
-#define kcloudFilename @"iCPredictor.txt"
+#define kcloudFilename @"predictor.txt"
 
 @interface iCloudDocument : UIDocument
 

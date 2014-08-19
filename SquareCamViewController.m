@@ -100,8 +100,6 @@ static CGContextRef CreateCGBitmapContextForSize(CGSize size)
     return context;
 }
 
-// static NSString* predictorOutputFilename = @"predictor.txt";
-
 #pragma mark-
 
 @interface UIImage (RotationMethods)
@@ -150,6 +148,8 @@ static CGContextRef CreateCGBitmapContextForSize(CGSize size)
 @end
 
 @implementation SquareCamViewController
+
+@synthesize fileDownloadMonitorQuery = _fileDownloadMonitorQuery;
 
 - (void)setupAVCapture
 {
@@ -949,6 +949,18 @@ bail:
     predictor = NULL;
     predictionState = eWaiting;
     
+
+    // Asynchronous nature of iCloud downloads means this fails!
+    // I suspect we need to run on the main thread and wait...or use the downloadPredictorFile function that adds an observer on the copy...?
+//    if ([self loadPredictorFileFromCloud: kcloudFilename]) {
+//        
+//        // Start predicting
+//        predictionState = ePredicting;
+//        self.lastFrameTime = [NSDate date];
+//    }
+//    else
+//        NSLog(@"loadPredictorFileFromCloud failed");
+
     lastInfo = NULL;
     
     [self setupInfoDisplay];
@@ -1013,8 +1025,8 @@ bail:
     }
     predictor = jpcnn_create_predictor_from_trainer(trainer);
 
-    [self writePredictorFileToCloud: predictor filename:kcloudFilename];
-    
+    [self savePredictorFileToCloud:predictor filename:kcloudFilename];
+
     predictionState = ePredicting;
     
     [self updateInfoDisplay];
@@ -1026,7 +1038,17 @@ bail:
     [self startPositiveLearning];
 }
 
-- (BOOL) writePredictorFileToCloud: (void *) predict filename: (NSString*) predictorFilename {
+- (NSString *) createFilename {
+    NSDate *time = [NSDate date];
+    NSDateFormatter* df = [NSDateFormatter new];
+    [df setDateFormat:@"dd-MM-yyyy-hh-mm-ss"];
+    NSString *timeString = [df stringFromDate:time];
+    NSString *fileName = [NSString stringWithFormat:@"predictor-%@%@", timeString, @".txt"];
+
+    return fileName;
+}
+
+- (BOOL) savePredictorFileToCloud: (void *) predict filename: (NSString*) fileName {
     // If we're connected to the console, warn the user before re-routing stderr
     if (isatty(STDERR_FILENO)) {
         NSLog(@"Predictor output will be re-directed to file");
@@ -1035,16 +1057,8 @@ bail:
     // get the local Documents directory path
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
     NSString *documentsDirectory = [paths objectAtIndex:0];
-    
-    // set up a unique-ish file
-    NSDate *time = [NSDate date];
-    NSDateFormatter* df = [NSDateFormatter new];
-    [df setDateFormat:@"dd-MM-yyyy-hh-mm-ss"];
-    NSString *timeString = [df stringFromDate:time];
-    NSString *fileName = [NSString stringWithFormat:@"predictor-%@%@", timeString, @".txt"];
-    // NSString *fileName =[NSString stringWithFormat:@"%@", predictorFilename];
     NSString *writableDBPath = [documentsDirectory stringByAppendingPathComponent:fileName];
-
+    
     // redirect stderr (predictor's output) to this file
     int savedStdErr = dup(STDERR_FILENO);
     FILE *fp = freopen([writableDBPath cStringUsingEncoding:NSASCIIStringEncoding], "w", stderr);
@@ -1062,7 +1076,10 @@ bail:
         // if so, tidy up...
         fclose(fp);
 
-        // ...and move it to the app's container on iCloud
+        // ...delete the file on iCloud if it already exists
+        [self deleteCloudFile:fileName];
+        
+        // ...and now move the new one to iCloud
         __block BOOL wasMoved = NO;
         dispatch_async (dispatch_get_global_queue (DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
             NSURL *sourceURL = [NSURL URLWithString:writableDBPath];
@@ -1084,34 +1101,123 @@ bail:
     }
 }
 
-- (BOOL) readPredictorFileFromCloud: (NSString*) predictorFilename {
+- (void)deleteCloudFile:(NSString *)fileName {
+    // Setup the path to delete from
+    NSFileManager *fileManager = [[[NSFileManager alloc] init] autorelease];
+    NSURL *deleteURL = [[fileManager URLForUbiquityContainerIdentifier:nil] URLByAppendingPathComponent:@"Documents" isDirectory:YES];
+    deleteURL = [deleteURL URLByAppendingPathComponent:fileName];
+    
+    // Wrap in file coordinator
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
+        NSFileCoordinator* fileCoordinator = [[NSFileCoordinator alloc] initWithFilePresenter:nil];
+        [fileCoordinator coordinateWritingItemAtURL:deleteURL
+                                            options:NSFileCoordinatorWritingForDeleting
+                                              error:nil
+                                         byAccessor:^(NSURL* writingURL) {
+                                             // Simple delete to start
+                                             // NSFileManager* fileManager = [[NSFileManager alloc] init];
+                                             [fileManager removeItemAtURL:deleteURL error:nil];
+                                         }];
+    });
+}
+
+- (BOOL) loadPredictorFileFromCloud: (NSString*) fileName {
     // get the local Documents directory path
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
     NSString *documentsDirectory = [paths objectAtIndex:0];
-    NSString *writableDBPath = [documentsDirectory stringByAppendingPathComponent:predictorFilename];
+    NSString *writableDBPath = [documentsDirectory stringByAppendingPathComponent:fileName];
     
-    // ...and move file from the app's container on iCloud
+    //TODO : Check that the iCloud file exists...
+    
+    // ...and move file from iCloud to local directory
     __block BOOL wasMoved = NO;
     dispatch_async (dispatch_get_global_queue (DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
         NSURL *destURL = [NSURL URLWithString:writableDBPath];
         NSFileManager *fileManager = [[[NSFileManager alloc] init] autorelease];
         NSURL *sourceURL = [[fileManager URLForUbiquityContainerIdentifier:nil] URLByAppendingPathComponent:@"Documents" isDirectory:YES];
-        sourceURL = [sourceURL URLByAppendingPathComponent:predictorFilename];
+        sourceURL = [sourceURL URLByAppendingPathComponent:fileName];
         NSError *error = nil;
         BOOL success = [fileManager setUbiquitous:NO itemAtURL:sourceURL destinationURL:destURL error:&error];
         if (success) {
-            NSLog(@"Move from iCloud for file: %@", destURL);
+            NSLog(@"Move to local for file: %@", destURL);
             
             // now load the predictor from the local file
             predictor = jpcnn_load_predictor([writableDBPath UTF8String]);
             assert(predictor != NULL);
             
         } else {
-            NSLog(@"Move from iCloud for file: %@ : failed - error: %@", destURL, error);
+            NSLog(@"Move to local for file: %@ : failed - error: %@", destURL, error);
         }
         wasMoved = success;
     });
     return wasMoved;
+}
+
+- (void)downloadPredictorFileFromCloud:(NSURL *)url
+{
+    dispatch_queue_t q_default;
+    q_default = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+    dispatch_async(q_default, ^{
+        
+        NSError *error = nil;
+        BOOL success = [[NSFileManager defaultManager] startDownloadingUbiquitousItemAtURL:url error:&error];
+        if (!success)
+        {
+            NSLog(@"Download to local for file: %@ : failed - error: %@", url, error);
+        }
+        else
+        {
+            NSDictionary *attrs = [url resourceValuesForKeys:@[NSURLUbiquitousItemDownloadingStatusKey] error:&error];
+            if (attrs != nil)
+            {
+                if ([[attrs objectForKey:NSURLUbiquitousItemDownloadingStatusKey] boolValue])
+                {
+                    NSLog(@"Already downloaded file: %@", url);
+                }
+                else
+                {
+                    NSMetadataQuery *query = [[NSMetadataQuery alloc] init];
+                    [query setPredicate:[NSPredicate predicateWithFormat:@"%K > 0", NSMetadataUbiquitousItemPercentDownloadedKey]];
+                    [query setSearchScopes:@[url]]; // scope the search only on this item
+                    
+                    [query setValueListAttributes:@[NSMetadataUbiquitousItemPercentDownloadedKey, NSURLUbiquitousItemDownloadingStatusKey]];
+                    
+                    _fileDownloadMonitorQuery = query;
+                    
+                    [[NSNotificationCenter defaultCenter] addObserver:self
+                                                             selector:@selector(liveUpdate:)
+                                                                 name:NSMetadataQueryDidUpdateNotification
+                                                               object:query];
+                    
+                    [self.fileDownloadMonitorQuery startQuery];
+                }
+            }
+        }
+    });
+}
+
+- (void)liveUpdate:(NSNotification *)notification
+{
+    NSMetadataQuery *query = [notification object];
+    
+    if (query != self.fileDownloadMonitorQuery)
+        return; // it's not our query
+    
+    if ([self.fileDownloadMonitorQuery resultCount] == 0)
+        return; // no items found
+    
+    NSMetadataItem *item = [self.fileDownloadMonitorQuery resultAtIndex:0];
+    double progress = [[item valueForAttribute:NSMetadataUbiquitousItemPercentDownloadedKey] doubleValue];
+    NSLog(@"Download progress = %f", progress);
+    
+    // report download progress somehow..
+    
+    if ([[item valueForAttribute:NSURLUbiquitousItemDownloadingStatusKey] boolValue])
+    {
+        // finished downloading, stop the query
+        [query stopQuery];
+        _fileDownloadMonitorQuery = nil;
+    }
 }
 
 - (void) setupInfoDisplay {
