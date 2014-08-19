@@ -72,6 +72,14 @@ enum EPredictionState {
     ePredicting,
 };
 
+enum ECloudDocumentState {
+    eCloudDocumentUnknown,
+    eCloudDocumentOpened,
+    eCloudDocumentCreated,
+    eCloudDocumentOpenFailed,
+    eCloudDocumentCreateFailed,
+};
+
 // used for KVO observation of the @"capturingStillImage" property to perform flash bulb animation
 static const NSString *AVCaptureStillImageIsCapturingStillImageContext = @"AVCaptureStillImageIsCapturingStillImageContext";
 
@@ -949,7 +957,6 @@ bail:
     predictor = NULL;
     predictionState = eWaiting;
     
-
     // Asynchronous nature of iCloud downloads means this fails!
     // I suspect we need to run on the main thread and wait...or use the downloadPredictorFile function that adds an observer on the copy...?
 //    if ([self loadPredictorFileFromCloud: kcloudFilename]) {
@@ -1036,6 +1043,59 @@ bail:
 
 - (void) restartLearning {
     [self startPositiveLearning];
+}
+
+-(int) initCloudDocument: (NSString *) fileName existsPath:(NSString **) existsPathName  {
+    NSArray *dirPaths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *docsDir = [dirPaths objectAtIndex:0];
+    NSString *dataFile = [docsDir stringByAppendingPathComponent:fileName];
+    int __block status = eCloudDocumentUnknown;
+    *existsPathName = @"";
+
+    _documentURL = [NSURL fileURLWithPath:dataFile];
+    _document = [[iCloudDocument alloc] initWithFileURL:_documentURL];
+    _document.fileContent = @"";
+    NSFileManager *filemgr = [NSFileManager defaultManager];
+
+    if ([filemgr fileExistsAtPath: dataFile])
+    {
+        [_document openWithCompletionHandler: ^(BOOL success) {
+            if (success){
+                *existsPathName = dataFile;
+                status = eCloudDocumentOpened;
+                NSLog(@"initCloudDocument : %@ opened", dataFile);
+            } else {
+                status = eCloudDocumentOpenFailed;
+                NSLog(@"initCloudDocument : %@ open failed", dataFile);
+            }
+         }];
+        
+    } else {
+        [_document saveToURL:_documentURL forSaveOperation:UIDocumentSaveForCreating completionHandler:^(BOOL success) {
+            if (success){
+                *existsPathName = [_documentURL absoluteString];
+                status = eCloudDocumentCreated;
+                NSLog(@"initCloudDocument : %@ created",  *existsPathName);
+            } else {
+                status = eCloudDocumentCreateFailed;
+                NSLog(@"initCloudDocument : %@ create failed", _documentURL);
+            }
+       }];
+    }
+    return status;
+}
+
+
+- (void)saveCloudDocument:(id)sender {
+    _document.fileContent = @"Saving...";
+    
+    [_document saveToURL:_documentURL forSaveOperation:UIDocumentSaveForOverwriting completionHandler:^(BOOL success) {
+        if (success){
+            NSLog(@"saveCloudDocument : saved for overwriting");
+        } else {
+            NSLog(@"saveCloudDocument : NOT saved for overwriting");
+        }
+    }];
 }
 
 - (NSString *) createFilename {

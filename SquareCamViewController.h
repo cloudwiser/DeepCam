@@ -47,6 +47,8 @@
 
 #import <UIKit/UIKit.h>
 #import <AVFoundation/AVFoundation.h>
+#import "iCloudDocument.h"
+
 @class CIDetector;
 
 @interface SquareCamViewController : UIViewController <UIGestureRecognizerDelegate, AVCaptureVideoDataOutputSampleBufferDelegate>
@@ -93,6 +95,8 @@
 @property (retain, nonatomic) NSDate *lastFrameTime;
 
 @property (strong) NSMetadataQuery *fileDownloadMonitorQuery;
+@property (strong, nonatomic) NSURL *documentURL;
+@property (strong, nonatomic) iCloudDocument *document;
 
 - (IBAction)takePicture:(id)sender;
 - (IBAction)switchCameras:(id)sender;
