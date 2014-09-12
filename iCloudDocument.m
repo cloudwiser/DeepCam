@@ -15,7 +15,7 @@
 
 // Called whenever the application reads data from the file system
 - (BOOL)loadFromContents:(id)contents ofType:(NSString *)typeName
-                   error:(NSError **)outError
+                   error:(NSError *__autoreleasing *)outError
 {
     
     if ([contents length] > 0) {
@@ -24,25 +24,21 @@
                             length:[contents length]
                             encoding:NSUTF8StringEncoding];
     } else {
-        // When the file is first created, assign some default content
-        self.fileContent = @"Empty";
+        self.fileContent = @"";
     }
     
     return YES;
 }
 
 // Called whenever the application (auto)saves the content of a file
-- (id)contentsForType:(NSString *)typeName error:(NSError **)outError
+- (id)contentsForType:(NSString *)typeName error:(NSError *__autoreleasing *)outError
 {
-    
-    if ([self.fileContent length] == 0) {
-        self.fileContent = @"Empty";
-    }
-    
     return [NSData dataWithBytes:[self.fileContent UTF8String]
                           length:[self.fileContent length]];
-    
 }
+
+
+
 
 /* also see 
     http://stackoverflow.com/questions/20592884/copy-file-to-icloud-without-having-to-remove-the-local-file?rq=1
