@@ -867,7 +867,8 @@ bail:
                           alignment:kCAAlignmentLeft];
 
         if ((labelCount == 0) && (value > 0.5f)) {
-            if ([[NSUserDefaults standardUserDefaults] boolForKey:@"useSpeech"])                [self speak: [label capitalizedString]];
+            if ([[NSUserDefaults standardUserDefaults] boolForKey:@"useSpeech"])
+                [self speak:[label capitalizedString]];
         }
 
         labelCount += 1;
@@ -1076,26 +1077,25 @@ bail:
         // if so, tidy up...
         fclose(fp);
 
-        // ...delete the file on iCloud if it already exists
+        // ...delete any existing file on iCloud
         [self deleteCloudFile:fileName];
         
-        // ...and now move the new one to iCloud
-        __block BOOL wasMoved = NO;
+        // ...and move the new predictor file to iCloud
+        __block BOOL success = NO;
         dispatch_async (dispatch_get_global_queue (DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
             NSURL *sourceURL = [NSURL URLWithString:writableDBPath];
             NSFileManager *fileManager = [[[NSFileManager alloc] init] autorelease];
             NSURL *destURL = [[fileManager URLForUbiquityContainerIdentifier:nil] URLByAppendingPathComponent:@"Documents" isDirectory:YES];
             destURL = [destURL URLByAppendingPathComponent:fileName];
             NSError *error = nil;
-            BOOL success = [fileManager setUbiquitous:YES itemAtURL:sourceURL destinationURL:destURL error:&error];
+            success = [fileManager setUbiquitous:YES itemAtURL:sourceURL destinationURL:destURL error:&error];
             if (success) {
-                NSLog(@"Move to iCloud for file: %@", destURL);
+                NSLog(@"%@ moved from local to iCloud", destURL);
             } else {
-                NSLog(@"Move to iCloud for file: %@ : failed - error: %@", destURL, error);
+                NSLog(@"%@ move from local to iCloud failed : error = %@", destURL, error);
             }
-            wasMoved = success;
         });
-        return wasMoved;
+        return success;
     } else {
         return NO;
     }
@@ -1115,7 +1115,6 @@ bail:
                                               error:nil
                                          byAccessor:^(NSURL* writingURL) {
                                              // Simple delete to start
-                                             // NSFileManager* fileManager = [[NSFileManager alloc] init];
                                              [fileManager removeItemAtURL:deleteURL error:nil];
                                          }];
     });
@@ -1127,9 +1126,9 @@ bail:
     NSString *documentsDirectory = [paths objectAtIndex:0];
     NSString *writableDBPath = [documentsDirectory stringByAppendingPathComponent:fileName];
     
-    //TODO : Check that the iCloud file exists...
+    //TODO : check that the iCloud-hosted file exists first...
     
-    // ...and move file from iCloud to local directory
+    // ...if it does, move it to the local directory container
     __block BOOL wasMoved = NO;
     dispatch_async (dispatch_get_global_queue (DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
         NSURL *destURL = [NSURL URLWithString:writableDBPath];
@@ -1139,14 +1138,14 @@ bail:
         NSError *error = nil;
         BOOL success = [fileManager setUbiquitous:NO itemAtURL:sourceURL destinationURL:destURL error:&error];
         if (success) {
-            NSLog(@"Move to local for file: %@", destURL);
+            NSLog(@"%@ moved from iCloud to local", destURL);
             
             // now load the predictor from the local file
             predictor = jpcnn_load_predictor([writableDBPath UTF8String]);
             assert(predictor != NULL);
             
         } else {
-            NSLog(@"Move to local for file: %@ : failed - error: %@", destURL, error);
+            NSLog(@"%@ move from iCloud to local failed : error = %@", destURL, error);
         }
         wasMoved = success;
     });
