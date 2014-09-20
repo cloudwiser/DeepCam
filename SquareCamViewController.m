@@ -1033,8 +1033,9 @@ bail:
     }
     predictor = jpcnn_create_predictor_from_trainer(trainer);
 
-    [self savePredictorFileToCloud:predictor filename:kcloudFilename];
-
+    // [self savePredictorFileToCloud:predictor filename:kcloudFilename];
+    [self savePredictorFileToCloud:predictor filename:[self createFilename]];
+    
     predictionState = ePredicting;
     
     [self updateInfoDisplay];
