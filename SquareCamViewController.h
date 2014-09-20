@@ -51,7 +51,7 @@
 
 @class CIDetector;
 
-@interface SquareCamViewController : UIViewController <UIGestureRecognizerDelegate, AVCaptureVideoDataOutputSampleBufferDelegate>
+@interface SquareCamViewController : UIViewController <UIGestureRecognizerDelegate, AVCaptureVideoDataOutputSampleBufferDelegate,UIAlertViewDelegate>
 {
 	IBOutlet UIView *previewView;
 	IBOutlet UISegmentedControl *camerasControl;

@@ -1033,7 +1033,6 @@ bail:
     }
     predictor = jpcnn_create_predictor_from_trainer(trainer);
 
-    // [self savePredictorFileToCloud:predictor filename:kcloudFilename];
     [self savePredictorFileToCloud:predictor filename:[self createFilename]];
     
     predictionState = ePredicting;
@@ -1101,6 +1100,16 @@ bail:
 }
 
 - (NSString *) createFilename {
+//    // Blocking prompt for tag word to prepend to the filename
+//    dispatch_sync(dispatch_get_main_queue(), ^(void) {
+//        UIAlertView * tagAlertView =[[UIAlertView alloc ] initWithTitle:@"Predictor tag" message:@"Enter tag word for the predictor filename" delegate:self cancelButtonTitle:@"Done" otherButtonTitles: nil];
+//        tagAlertView.alertViewStyle = UIAlertViewStylePlainTextInput;
+//        [tagAlertView show];
+//    });
+//    
+//    // DEBUG
+//    NSLog(@"tag alert dismissed?");
+    
     NSDate *time = [NSDate date];
     NSDateFormatter* df = [NSDateFormatter new];
     [df setDateFormat:@"dd-MM-yyyy-hh-mm-ss"];
@@ -1109,6 +1118,19 @@ bail:
 
     return fileName;
 }
+
+- (void) alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
+    // Done button pressed...
+    if (buttonIndex == 0)
+    {
+        UITextField* tag = [alertView textFieldAtIndex:0];
+        tag.keyboardType = UIKeyboardTypeASCIICapable;
+    
+        // DEBUG
+        NSLog(@"Predictor tag word: %@", tag.text);
+    }
+}
+
 
 - (BOOL) savePredictorFileToCloud: (void *) predict filename: (NSString*) fileName {
     // If we're connected to the console, warn the user before re-routing stderr
@@ -1292,7 +1314,7 @@ bail:
     
     const float progressHeight = 20.0f;
     
-    const float infoHeight = 150.0f;
+    const float infoHeight = 120.0f;
     
     const CGRect progressBackgroundBounds = CGRectMake(marginSizeX, marginTopY, (viewWidth - (marginSizeX * 2)), progressHeight);
     
