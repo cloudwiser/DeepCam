@@ -1033,7 +1033,7 @@ bail:
     }
     predictor = jpcnn_create_predictor_from_trainer(trainer);
 
-    [self savePredictorFileToCloud:predictor filename:[self createFilename]];
+    [self savePredictorAlert];
     
     predictionState = ePredicting;
     
@@ -1046,91 +1046,39 @@ bail:
     [self startPositiveLearning];
 }
 
--(int) initCloudDocument: (NSString *) fileName existsPath:(NSString **) existsPathName  {
-    NSArray *dirPaths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-    NSString *docsDir = [dirPaths objectAtIndex:0];
-    NSString *dataFile = [docsDir stringByAppendingPathComponent:fileName];
-    int __block status = eCloudDocumentUnknown;
-    *existsPathName = @"";
-
-    _documentURL = [NSURL fileURLWithPath:dataFile];
-    _document = [[iCloudDocument alloc] initWithFileURL:_documentURL];
-    _document.fileContent = @"";
-    NSFileManager *filemgr = [NSFileManager defaultManager];
-
-    if ([filemgr fileExistsAtPath: dataFile])
-    {
-        [_document openWithCompletionHandler: ^(BOOL success) {
-            if (success){
-                *existsPathName = dataFile;
-                status = eCloudDocumentOpened;
-                NSLog(@"initCloudDocument : %@ opened", dataFile);
-            } else {
-                status = eCloudDocumentOpenFailed;
-                NSLog(@"initCloudDocument : %@ open failed", dataFile);
-            }
-         }];
-        
-    } else {
-        [_document saveToURL:_documentURL forSaveOperation:UIDocumentSaveForCreating completionHandler:^(BOOL success) {
-            if (success){
-                *existsPathName = [_documentURL absoluteString];
-                status = eCloudDocumentCreated;
-                NSLog(@"initCloudDocument : %@ created",  *existsPathName);
-            } else {
-                status = eCloudDocumentCreateFailed;
-                NSLog(@"initCloudDocument : %@ create failed", _documentURL);
-            }
-       }];
-    }
-    return status;
-}
-
-
-- (void)saveCloudDocument:(id)sender {
-    _document.fileContent = @"Saving...";
+- (void) savePredictorAlert {
+    // Prompt for tag word...
+    UIAlertView * tagAlertView =[[UIAlertView alloc ] initWithTitle:@"Predictor tag" message:@"Enter tag word for the predictor filename" delegate:self cancelButtonTitle:@"Done" otherButtonTitles: nil];
+    tagAlertView.alertViewStyle = UIAlertViewStylePlainTextInput;
+    UITextField *tagField = [tagAlertView textFieldAtIndex:0];
+    tagField.placeholder = @"tag";
+    [tagAlertView show];
     
-    [_document saveToURL:_documentURL forSaveOperation:UIDocumentSaveForOverwriting completionHandler:^(BOOL success) {
-        if (success){
-            NSLog(@"saveCloudDocument : saved for overwriting");
-        } else {
-            NSLog(@"saveCloudDocument : NOT saved for overwriting");
-        }
-    }];
-}
-
-- (NSString *) createFilename {
-//    // Blocking prompt for tag word to prepend to the filename
-//    dispatch_sync(dispatch_get_main_queue(), ^(void) {
-//        UIAlertView * tagAlertView =[[UIAlertView alloc ] initWithTitle:@"Predictor tag" message:@"Enter tag word for the predictor filename" delegate:self cancelButtonTitle:@"Done" otherButtonTitles: nil];
-//        tagAlertView.alertViewStyle = UIAlertViewStylePlainTextInput;
-//        [tagAlertView show];
-//    });
-//    
-//    // DEBUG
-//    NSLog(@"tag alert dismissed?");
-    
-    NSDate *time = [NSDate date];
-    NSDateFormatter* df = [NSDateFormatter new];
-    [df setDateFormat:@"dd-MM-yyyy-hh-mm-ss"];
-    NSString *timeString = [df stringFromDate:time];
-    NSString *fileName = [NSString stringWithFormat:@"predictor-%@%@", timeString, @".txt"];
-
-    return fileName;
+    // ...for the predictor save in the delegate method
 }
 
 - (void) alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
     // Done button pressed...
     if (buttonIndex == 0)
     {
-        UITextField* tag = [alertView textFieldAtIndex:0];
-        tag.keyboardType = UIKeyboardTypeASCIICapable;
-    
-        // DEBUG
-        NSLog(@"Predictor tag word: %@", tag.text);
+        UITextField* tagField = [alertView textFieldAtIndex:0];
+        tagField.keyboardType = UIKeyboardTypeASCIICapable;
+        
+        // TODO - strip out invalid characters for a filename from the tag?
+        
+        // Build the filename of the form: <tag>-<time>.txt
+        NSDate *time = [NSDate date];
+        NSDateFormatter* df = [NSDateFormatter new];
+        [df setDateFormat:@"dd-MM-yyyy-hh-mm-ss"];
+        NSString *timeString = [df stringFromDate:time];
+        NSString *fileName = [NSString stringWithFormat:@"%@-%@%@", tagField.text, timeString, @".txt"];
+        
+        // And save to iCloud
+        [self savePredictorFileToCloud:predictor filename: fileName];
     }
 }
 
+#pragma mark - iCloud handlers
 
 - (BOOL) savePredictorFileToCloud: (void *) predict filename: (NSString*) fileName {
     // If we're connected to the console, warn the user before re-routing stderr
@@ -1302,6 +1250,60 @@ bail:
     }
 }
 
+-(int) initCloudDocument: (NSString *) fileName existsPath:(NSString **) existsPathName  {
+    NSArray *dirPaths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *docsDir = [dirPaths objectAtIndex:0];
+    NSString *dataFile = [docsDir stringByAppendingPathComponent:fileName];
+    int __block status = eCloudDocumentUnknown;
+    *existsPathName = @"";
+    
+    _documentURL = [NSURL fileURLWithPath:dataFile];
+    _document = [[iCloudDocument alloc] initWithFileURL:_documentURL];
+    _document.fileContent = @"";
+    NSFileManager *filemgr = [NSFileManager defaultManager];
+    
+    if ([filemgr fileExistsAtPath: dataFile])
+    {
+        [_document openWithCompletionHandler: ^(BOOL success) {
+            if (success){
+                *existsPathName = dataFile;
+                status = eCloudDocumentOpened;
+                NSLog(@"initCloudDocument : %@ opened", dataFile);
+            } else {
+                status = eCloudDocumentOpenFailed;
+                NSLog(@"initCloudDocument : %@ open failed", dataFile);
+            }
+        }];
+        
+    } else {
+        [_document saveToURL:_documentURL forSaveOperation:UIDocumentSaveForCreating completionHandler:^(BOOL success) {
+            if (success){
+                *existsPathName = [_documentURL absoluteString];
+                status = eCloudDocumentCreated;
+                NSLog(@"initCloudDocument : %@ created",  *existsPathName);
+            } else {
+                status = eCloudDocumentCreateFailed;
+                NSLog(@"initCloudDocument : %@ create failed", _documentURL);
+            }
+        }];
+    }
+    return status;
+}
+
+- (void)saveCloudDocument:(id)sender {
+    _document.fileContent = @"Saving...";
+    
+    [_document saveToURL:_documentURL forSaveOperation:UIDocumentSaveForOverwriting completionHandler:^(BOOL success) {
+        if (success){
+            NSLog(@"saveCloudDocument : saved for overwriting");
+        } else {
+            NSLog(@"saveCloudDocument : NOT saved for overwriting");
+        }
+    }];
+}
+
+#pragma mark - DeepBelief predictor info display
+
 - (void) setupInfoDisplay {
     NSString* const font = @"HelveticaNeue";
     const float fontSize = 20.0f;
@@ -1420,6 +1422,8 @@ bail:
     progressForegroundBounds.size.width = foregroundWidth;
     [self.progressForeground setFrame: progressForegroundBounds];
 }
+
+#pragma mark - DeepBelief network prediction handler
 
 - (void) handleNetworkPredictions: (float*) predictions withLength: (int) predictionsLength {
     switch (predictionState) {
