@@ -158,6 +158,7 @@ static CGContextRef CreateCGBitmapContextForSize(CGSize size)
 @implementation SquareCamViewController
 
 @synthesize fileDownloadMonitorQuery = _fileDownloadMonitorQuery;
+@synthesize currentLocation = _currentLocation;
 
 - (void)setupAVCapture
 {
@@ -701,6 +702,19 @@ bail:
     synth = [[AVSpeechSynthesizer alloc] init];
     labelLayers = [[NSMutableArray alloc] init];
     oldPredictionValues = [[NSMutableDictionary alloc] init];
+
+    // Create location, manager & start updating
+    if (currentLocation == nil)
+        currentLocation = [[CLLocation alloc] init];
+    if (locationManager == nil)
+        locationManager = [[CLLocationManager alloc] init];
+    locationManager.delegate = self;
+    locationManager.desiredAccuracy = kCLLocationAccuracyKilometer;
+    // Set a movement threshold for new events
+    locationManager.distanceFilter = kCLDistanceFilterNone; // was 500 meters
+    
+    [locationManager requestWhenInUseAuthorization];
+    [locationManager startUpdatingLocation];
 }
 
 - (void)viewDidUnload
@@ -1047,6 +1061,9 @@ bail:
 }
 
 - (void) savePredictorAlert {
+    // Update the location
+    [locationManager startUpdatingLocation];
+    
     // Prompt for tag word...
     UIAlertView * tagAlertView =[[UIAlertView alloc ] initWithTitle:@"Predictor tag" message:@"Enter tag word for the predictor filename" delegate:self cancelButtonTitle:@"Done" otherButtonTitles: nil];
     tagAlertView.alertViewStyle = UIAlertViewStylePlainTextInput;
@@ -1066,12 +1083,16 @@ bail:
         
         // TODO - strip out invalid characters for a filename from the tag?
         
-        // Build the filename of the form: <tag>-<time>.txt
+        // Build the filename of the form: <tag>-<time>-<lat>-<long>.txt
+//        NSString * latitude = [[[NSString alloc] initWithFormat:@"%f", currentLocation.coordinate.latitude] autorelease];
+//        NSString * longitude = [[[NSString alloc] initWithFormat:@"%f", currentLocation.coordinate.longitude] autorelease];
         NSDate *time = [NSDate date];
         NSDateFormatter* df = [NSDateFormatter new];
+        
         [df setDateFormat:@"dd-MM-yyyy-hh-mm-ss"];
         NSString *timeString = [df stringFromDate:time];
-        NSString *fileName = [NSString stringWithFormat:@"%@-%@%@", tagField.text, timeString, @".txt"];
+        NSString *fileName = [NSString stringWithFormat:@"%@-%@[%f][%f].%@", tagField.text, timeString,
+                            self.currentLocation.coordinate.latitude, self.currentLocation.coordinate.longitude, @"txt"];
         
         // And save to iCloud
         [self savePredictorFileToCloud:predictor filename: fileName];
@@ -1150,6 +1171,9 @@ bail:
                                          }];
     });
 }
+
+
+#pragma mark - TODO : iCloud retrieval handlers
 
 - (BOOL) loadPredictorFileFromCloud: (NSString*) fileName {
     // get the local Documents directory path
@@ -1301,6 +1325,19 @@ bail:
         }
     }];
 }
+
+
+#pragma mark - Location Manager delegate
+
+- (void)locationManager:(CLLocationManager *)manager didUpdateToLocation:(CLLocation *)newLocation fromLocation:(CLLocation *)oldLocation
+{
+    self.currentLocation = newLocation;
+    [manager stopUpdatingLocation];
+    
+    NSLog(@"latitude: %f", currentLocation.coordinate.latitude);
+    NSLog(@"longitude: %f", currentLocation.coordinate.longitude);
+}
+
 
 #pragma mark - DeepBelief predictor info display
 

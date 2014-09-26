@@ -47,11 +47,12 @@
 
 #import <UIKit/UIKit.h>
 #import <AVFoundation/AVFoundation.h>
+#import <CoreLocation/CoreLocation.h>
 #import "iCloudDocument.h"
 
 @class CIDetector;
 
-@interface SquareCamViewController : UIViewController <UIGestureRecognizerDelegate, AVCaptureVideoDataOutputSampleBufferDelegate,UIAlertViewDelegate>
+@interface SquareCamViewController : UIViewController <UIGestureRecognizerDelegate, AVCaptureVideoDataOutputSampleBufferDelegate,UIAlertViewDelegate, CLLocationManagerDelegate>
 {
 	IBOutlet UIView *previewView;
 	IBOutlet UISegmentedControl *camerasControl;
@@ -83,6 +84,9 @@
     
     NSString* lastInfo;
     float timeToNextPing;
+    
+    CLLocationManager* locationManager;
+    CLLocation* currentLocation;
 }
 @property (retain, nonatomic) CATextLayer *predictionTextLayer;
 @property (retain, nonatomic) CATextLayer *progressBackground;
@@ -93,6 +97,8 @@
 @property (readwrite)   CFURLRef        soundFileURLRef;
 @property (readonly)    SystemSoundID   soundFileObject;
 @property (retain, nonatomic) NSDate *lastFrameTime;
+
+@property (retain, nonatomic) CLLocation *currentLocation;
 
 @property (strong) NSMetadataQuery *fileDownloadMonitorQuery;
 @property (strong, nonatomic) NSURL *documentURL;
