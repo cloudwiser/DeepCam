@@ -108,8 +108,6 @@ static CGContextRef CreateCGBitmapContextForSize(CGSize size)
     return context;
 }
 
-static NSString *iCloudContainerIdentifier = @"com.apple.developer.icloud-container-identifiers";
-
 #pragma mark-
 
 @interface UIImage (RotationMethods)
@@ -1339,8 +1337,8 @@ bail:
     self.currentLocation = newLocation;
     [manager stopUpdatingLocation];
     
-    NSLog(@"latitude: %f", currentLocation.coordinate.latitude);
-    NSLog(@"longitude: %f", currentLocation.coordinate.longitude);
+    NSLog(@"latitude: %f", self.currentLocation.coordinate.latitude);
+    NSLog(@"longitude: %f", self.currentLocation.coordinate.longitude);
 }
 
 

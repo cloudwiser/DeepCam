@@ -54,8 +54,6 @@
 @synthesize doc = _doc;
 @synthesize query = _query;
 
-static NSString *iCloudContainerIdentifier = @"com.apple.developer.icloud-container-identifiers";
-
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
     // Override point for customization after application launch.
