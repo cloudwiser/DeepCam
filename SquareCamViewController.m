@@ -108,6 +108,8 @@ static CGContextRef CreateCGBitmapContextForSize(CGSize size)
     return context;
 }
 
+static NSString *iCloudContainerIdentifier = @"com.apple.developer.icloud-container-identifiers";
+
 #pragma mark-
 
 @interface UIImage (RotationMethods)
@@ -1137,7 +1139,8 @@ bail:
         dispatch_async (dispatch_get_global_queue (DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
             NSURL *sourceURL = [NSURL URLWithString:writableDBPath];
             NSFileManager *fileManager = [[[NSFileManager alloc] init] autorelease];
-            NSURL *destURL = [[fileManager URLForUbiquityContainerIdentifier:nil] URLByAppendingPathComponent:@"Documents" isDirectory:YES];
+            NSURL *destURL = [[fileManager URLForUbiquityContainerIdentifier:nil]
+                              URLByAppendingPathComponent:@"Documents" isDirectory:YES];
             destURL = [destURL URLByAppendingPathComponent:fileName];
             NSError *error = nil;
             success = [fileManager setUbiquitous:YES itemAtURL:sourceURL destinationURL:destURL error:&error];
@@ -1156,7 +1159,8 @@ bail:
 - (void)deleteCloudFile:(NSString *)fileName {
     // Setup the path to delete from
     NSFileManager *fileManager = [[[NSFileManager alloc] init] autorelease];
-    NSURL *deleteURL = [[fileManager URLForUbiquityContainerIdentifier:nil] URLByAppendingPathComponent:@"Documents" isDirectory:YES];
+    NSURL *deleteURL = [[fileManager URLForUbiquityContainerIdentifier:nil]
+                        URLByAppendingPathComponent:@"Documents" isDirectory:YES];
     deleteURL = [deleteURL URLByAppendingPathComponent:fileName];
     
     // Wrap in file coordinator
@@ -1188,7 +1192,8 @@ bail:
     dispatch_async (dispatch_get_global_queue (DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
         NSURL *destURL = [NSURL URLWithString:writableDBPath];
         NSFileManager *fileManager = [[[NSFileManager alloc] init] autorelease];
-        NSURL *sourceURL = [[fileManager URLForUbiquityContainerIdentifier:nil] URLByAppendingPathComponent:@"Documents" isDirectory:YES];
+        NSURL *sourceURL = [[fileManager URLForUbiquityContainerIdentifier:nil]
+                            URLByAppendingPathComponent:@"Documents" isDirectory:YES];
         sourceURL = [sourceURL URLByAppendingPathComponent:fileName];
         NSError *error = nil;
         BOOL success = [fileManager setUbiquitous:NO itemAtURL:sourceURL destinationURL:destURL error:&error];

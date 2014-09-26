@@ -54,6 +54,8 @@
 @synthesize doc = _doc;
 @synthesize query = _query;
 
+static NSString *iCloudContainerIdentifier = @"com.apple.developer.icloud-container-identifiers";
+
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
     // Override point for customization after application launch.
@@ -61,7 +63,7 @@
     
     // Check to see if iCloud is available
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        NSURL *iCloudRoot = [[NSFileManager defaultManager] URLForUbiquityContainerIdentifier:nil];
+        NSURL *iCloudRoot = [[NSFileManager defaultManager] URLForUbiquityContainerIdentifier:nil];   // was nil];
         dispatch_async(dispatch_get_main_queue(), ^{
             if (iCloudRoot != nil)
                 NSLog(@"iCloud available at: %@", iCloudRoot);
