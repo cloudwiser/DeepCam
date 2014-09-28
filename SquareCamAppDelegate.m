@@ -51,8 +51,6 @@
 @implementation SquareCamAppDelegate
 
 @synthesize window = _window;
-@synthesize doc = _doc;
-@synthesize query = _query;
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
@@ -104,75 +102,6 @@
 	 Save data if appropriate.
 	 See also applicationDidEnterBackground:.
 	 */
-}
-
-
-- (void)loadDocument
-{
-    NSMetadataQuery *query = [[NSMetadataQuery alloc] init];
-    _query = query;
-    [query setSearchScopes:[NSArray arrayWithObject:
-                            NSMetadataQueryUbiquitousDocumentsScope]];
-    NSPredicate *pred = [NSPredicate predicateWithFormat:
-                         @"%K == %@", NSMetadataItemFSNameKey, kcloudFilename];
-    [query setPredicate:pred];
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(queryDidFinishGathering:)
-                                                 name:NSMetadataQueryDidFinishGatheringNotification
-                                               object:query];
-    [query startQuery];
-}
-
-- (void)queryDidFinishGathering:(NSNotification *)notification {
-    
-    NSMetadataQuery *query = [notification object];
-    [query disableUpdates];
-    [query stopQuery];
-    
-    [[NSNotificationCenter defaultCenter] removeObserver:self
-                                                    name:NSMetadataQueryDidFinishGatheringNotification
-                                                  object:query];
-    _query = nil;
-    
-    [self loadData:query];
-}
-
-- (void)loadData:(NSMetadataQuery *)query {
-    
-    if ([query resultCount] == 1) {
-        
-        NSMetadataItem *item = [query resultAtIndex:0];
-        NSURL *url = [item valueForAttribute:NSMetadataItemURLKey];
-        iCloudDocument *doc = [[iCloudDocument alloc] initWithFileURL:url];
-        self.doc = doc;
-        [self.doc openWithCompletionHandler:^(BOOL success) {
-            if (success) {
-                NSLog(@"iCloud document opened");
-            } else {
-                NSLog(@"failed opening document from iCloud");
-            }
-        }];
-        
-    }
-    else {
-        
-        NSURL *ubiq = [[NSFileManager defaultManager]
-                       URLForUbiquityContainerIdentifier:nil];
-        NSURL *ubiquitousPackage = [[ubiq URLByAppendingPathComponent:
-                                     @"Documents"] URLByAppendingPathComponent:kcloudFilename];
-        
-        iCloudDocument *doc = [[iCloudDocument alloc] initWithFileURL:ubiquitousPackage];
-        self.doc = doc;
-        
-        [doc saveToURL:[doc fileURL]
-            forSaveOperation:UIDocumentSaveForCreating completionHandler:^(BOOL success) {
-                if (success) {
-                    [doc openWithCompletionHandler:^(BOOL success) {
-                        NSLog(@"new document opened from iCloud");
-                    }];
-                }
-            }];
-    }
 }
 
 @end

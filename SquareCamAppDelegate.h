@@ -51,9 +51,5 @@
 @interface SquareCamAppDelegate : UIResponder <UIApplicationDelegate>
 
 @property (strong, nonatomic) UIWindow *window;
-@property (strong) iCloudDocument * doc;
-@property (strong) NSMetadataQuery *query;
-
-- (void)loadDocument;
 
 @end

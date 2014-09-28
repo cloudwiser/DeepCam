@@ -53,8 +53,6 @@
 #include <sys/time.h>
 
 #import "DeepBelief/DeepBelief.h"
-#import "iCloudDocument.h"
-// #import "DeepCam-Swift.h"
 
 #pragma mark-
 
@@ -713,6 +711,11 @@ bail:
     // Set a movement threshold for new events
     locationManager.distanceFilter = kCLDistanceFilterNone; // was 500 meters
     
+    _iCloudURLs = [[NSMutableArray alloc] init];
+    // Add at beginning of a refresh method
+    _iCloudURLsReady = NO;
+    [_iCloudURLs removeAllObjects];
+    
     [locationManager requestWhenInUseAuthorization];
     [locationManager startUpdatingLocation];
 }
@@ -733,11 +736,13 @@ bail:
 - (void)viewDidAppear:(BOOL)animated
 {
     [super viewDidAppear:animated];
+    [_query enableUpdates];
 }
 
 - (void)viewWillDisappear:(BOOL)animated
 {
 	[super viewWillDisappear:animated];
+    [_query disableUpdates];
 }
 
 - (void)viewDidDisappear:(BOOL)animated
@@ -1065,13 +1070,15 @@ bail:
     [locationManager startUpdatingLocation];
     
     // Prompt for tag word...
-    UIAlertView * tagAlertView =[[UIAlertView alloc ] initWithTitle:@"Predictor tag" message:@"Enter tag word for the predictor filename" delegate:self cancelButtonTitle:@"Done" otherButtonTitles: nil];
+    UIAlertView * tagAlertView =[[UIAlertView alloc ] initWithTitle:@"Predictor tag"
+                                                            message:@"Enter tag word for the predictor filename"
+                                                            delegate:self cancelButtonTitle:@"Done" otherButtonTitles: nil];
     tagAlertView.alertViewStyle = UIAlertViewStylePlainTextInput;
     UITextField *tagField = [tagAlertView textFieldAtIndex:0];
     tagField.placeholder = @"tag";
     [tagAlertView show];
     
-    // ...for the predictor save in the delegate method
+    // ...and handle in the delegate below
 }
 
 - (void) alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
@@ -1084,22 +1091,22 @@ bail:
         // TODO - strip out invalid characters for a filename from the tag?
         
         // Build the filename of the form: <tag>-<time>-<lat>-<long>.txt
-//        NSString * latitude = [[[NSString alloc] initWithFormat:@"%f", currentLocation.coordinate.latitude] autorelease];
-//        NSString * longitude = [[[NSString alloc] initWithFormat:@"%f", currentLocation.coordinate.longitude] autorelease];
         NSDate *time = [NSDate date];
         NSDateFormatter* df = [NSDateFormatter new];
         
         [df setDateFormat:@"dd-MM-yyyy-hh-mm-ss"];
         NSString *timeString = [df stringFromDate:time];
-        NSString *fileName = [NSString stringWithFormat:@"%@-%@[%f][%f].%@", tagField.text, timeString,
-                            self.currentLocation.coordinate.latitude, self.currentLocation.coordinate.longitude, @"txt"];
+        NSString *fileName = [NSString stringWithFormat:@"%@-%@[%f][%f].%@",
+                              tagField.text, timeString,
+                              self.currentLocation.coordinate.latitude, self.currentLocation.coordinate.longitude,
+                              PRED_FILE_EXTENSION];
         
-        // And save to iCloud
+        // And save it to iCloud
         [self savePredictorFileToCloud:predictor filename: fileName];
     }
 }
 
-#pragma mark - iCloud handlers
+#pragma mark - iCloud save & delete handlers
 
 - (BOOL) savePredictorFileToCloud: (void *) predict filename: (NSString*) fileName {
     // If we're connected to the console, warn the user before re-routing stderr
@@ -1175,7 +1182,80 @@ bail:
 }
 
 
-#pragma mark - TODO : iCloud retrieval handlers
+#pragma mark - TODO : iCloud directory query handler
+
+- (NSMetadataQuery *)documentQuery {
+    NSMetadataQuery * query = [[NSMetadataQuery alloc] init];
+    if (query) {
+        
+        // Search documents subdir only
+        [query setSearchScopes:[NSArray arrayWithObject:NSMetadataQueryUbiquitousDocumentsScope]];
+        
+        // Add a predicate for finding the documents
+        NSString * filePattern = [NSString stringWithFormat:@"*.%@", PRED_FILE_EXTENSION];
+        [query setPredicate:[NSPredicate predicateWithFormat:@"%K LIKE %@",
+                             NSMetadataItemFSNameKey, filePattern]];
+        
+    }
+    return query;
+}
+
+- (void)stopQuery {
+    if (_query) {
+        NSLog(@"No longer watching iCloud dir...");
+        
+        [[NSNotificationCenter defaultCenter] removeObserver:self name:NSMetadataQueryDidFinishGatheringNotification object:nil];
+        [[NSNotificationCenter defaultCenter] removeObserver:self name:NSMetadataQueryDidUpdateNotification object:nil];
+        [_query stopQuery];
+        _query = nil;
+    }
+}
+
+- (void)startQuery {
+    [self stopQuery];
+    NSLog(@"Starting to watch iCloud dir...");
+    _query = [self documentQuery];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(processiCloudFiles:)
+                                                 name:NSMetadataQueryDidFinishGatheringNotification
+                                               object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(processiCloudFiles:)
+                                                 name:NSMetadataQueryDidUpdateNotification
+                                               object:nil];
+    [_query startQuery];
+}
+
+- (void)processiCloudFiles:(NSNotification *)notification {
+    
+    // Always disable updates while processing results
+    [_query disableUpdates];
+    
+    [_iCloudURLs removeAllObjects];
+    
+    // The query reports all files found, every time.
+    NSArray * queryResults = [_query results];
+    for (NSMetadataItem * result in queryResults) {
+        NSURL * fileURL = [result valueForAttribute:NSMetadataItemURLKey];
+        NSNumber * aBool = nil;
+        
+        // Don't include hidden files
+        [fileURL getResourceValue:&aBool forKey:NSURLIsHiddenKey error:nil];
+        if (aBool && ![aBool boolValue]) {
+            [_iCloudURLs addObject:fileURL];
+        }
+        
+    }
+    
+    NSLog(@"Found %lu iCloud files.", (unsigned long)_iCloudURLs.count);
+    _iCloudURLsReady = YES;
+    
+    [_query enableUpdates];
+}
+
+
+#pragma mark - TODO : iCloud read handlers
 
 - (BOOL) loadPredictorFileFromCloud: (NSString*) fileName {
     // get the local Documents directory path
@@ -1277,58 +1357,6 @@ bail:
     }
 }
 
--(int) initCloudDocument: (NSString *) fileName existsPath:(NSString **) existsPathName  {
-    NSArray *dirPaths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-    NSString *docsDir = [dirPaths objectAtIndex:0];
-    NSString *dataFile = [docsDir stringByAppendingPathComponent:fileName];
-    int __block status = eCloudDocumentUnknown;
-    *existsPathName = @"";
-    
-    _documentURL = [NSURL fileURLWithPath:dataFile];
-    _document = [[iCloudDocument alloc] initWithFileURL:_documentURL];
-    _document.fileContent = @"";
-    NSFileManager *filemgr = [NSFileManager defaultManager];
-    
-    if ([filemgr fileExistsAtPath: dataFile])
-    {
-        [_document openWithCompletionHandler: ^(BOOL success) {
-            if (success){
-                *existsPathName = dataFile;
-                status = eCloudDocumentOpened;
-                NSLog(@"initCloudDocument : %@ opened", dataFile);
-            } else {
-                status = eCloudDocumentOpenFailed;
-                NSLog(@"initCloudDocument : %@ open failed", dataFile);
-            }
-        }];
-        
-    } else {
-        [_document saveToURL:_documentURL forSaveOperation:UIDocumentSaveForCreating completionHandler:^(BOOL success) {
-            if (success){
-                *existsPathName = [_documentURL absoluteString];
-                status = eCloudDocumentCreated;
-                NSLog(@"initCloudDocument : %@ created",  *existsPathName);
-            } else {
-                status = eCloudDocumentCreateFailed;
-                NSLog(@"initCloudDocument : %@ create failed", _documentURL);
-            }
-        }];
-    }
-    return status;
-}
-
-- (void)saveCloudDocument:(id)sender {
-    _document.fileContent = @"Saving...";
-    
-    [_document saveToURL:_documentURL forSaveOperation:UIDocumentSaveForOverwriting completionHandler:^(BOOL success) {
-        if (success){
-            NSLog(@"saveCloudDocument : saved for overwriting");
-        } else {
-            NSLog(@"saveCloudDocument : NOT saved for overwriting");
-        }
-    }];
-}
-
 
 #pragma mark - Location Manager delegate
 
@@ -1378,31 +1406,35 @@ bail:
     
     [[self.view layer] addSublayer: self.progressForeground];
     
-    const CGRect infoBackgroundBounds = CGRectMake(marginSizeX, (marginSizeY + progressHeight + marginSizeY), (viewWidth - (marginSizeX * 2)), infoHeight);
-    
-    self.infoBackground = [CATextLayer layer];
-    [self.infoBackground setBackgroundColor: [UIColor blackColor].CGColor];
-    [self.infoBackground setOpacity:0.5f];
-    [self.infoBackground setFrame: infoBackgroundBounds];
-    self.infoBackground.cornerRadius = 5.0f;
-    
-    [[self.view layer] addSublayer: self.infoBackground];
-    
-    const CGRect infoForegroundBounds = CGRectInset(infoBackgroundBounds, 5.0f, 5.0f);
-    
-    self.infoForeground = [CATextLayer layer];
-    [self.infoForeground setBackgroundColor: [UIColor clearColor].CGColor];
-    [self.infoForeground setForegroundColor: [UIColor whiteColor].CGColor];
-    [self.infoForeground setOpacity:1.0f];
-    [self.infoForeground setFrame: infoForegroundBounds];
-    [self.infoForeground setWrapped: YES];
-    [self.infoForeground setFont: font];
-    [self.infoForeground setFontSize: fontSize];
-    self.infoForeground.contentsScale = [[UIScreen mainScreen] scale];
-    
-    [self.infoForeground setString: @""];
-    
-    [[self.view layer] addSublayer: self.infoForeground];
+    // Show the OSD help prompts?
+    if ([[NSUserDefaults standardUserDefaults] boolForKey:@"useOSDHelp"]) {
+
+        const CGRect infoBackgroundBounds = CGRectMake(marginSizeX, (marginSizeY + progressHeight + marginSizeY), (viewWidth - (marginSizeX * 2)), infoHeight);
+        
+        self.infoBackground = [CATextLayer layer];
+        [self.infoBackground setBackgroundColor: [UIColor blackColor].CGColor];
+        [self.infoBackground setOpacity:0.5f];
+        [self.infoBackground setFrame: infoBackgroundBounds];
+        self.infoBackground.cornerRadius = 5.0f;
+        
+        [[self.view layer] addSublayer: self.infoBackground];
+        
+        const CGRect infoForegroundBounds = CGRectInset(infoBackgroundBounds, 5.0f, 5.0f);
+        
+        self.infoForeground = [CATextLayer layer];
+        [self.infoForeground setBackgroundColor: [UIColor clearColor].CGColor];
+        [self.infoForeground setForegroundColor: [UIColor whiteColor].CGColor];
+        [self.infoForeground setOpacity:1.0f];
+        [self.infoForeground setFrame: infoForegroundBounds];
+        [self.infoForeground setWrapped: YES];
+        [self.infoForeground setFont: font];
+        [self.infoForeground setFontSize: fontSize];
+        self.infoForeground.contentsScale = [[UIScreen mainScreen] scale];
+        
+        [self.infoForeground setString: @""];
+        
+        [[self.view layer] addSublayer: self.infoForeground];
+   }
 }
 
 - (void) updateInfoDisplay {

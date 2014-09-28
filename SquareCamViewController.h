@@ -48,7 +48,6 @@
 #import <UIKit/UIKit.h>
 #import <AVFoundation/AVFoundation.h>
 #import <CoreLocation/CoreLocation.h>
-#import "iCloudDocument.h"
 
 @class CIDetector;
 
@@ -85,6 +84,15 @@
     NSString* lastInfo;
     float timeToNextPing;
     
+    // predictor file extension
+    #define PRED_FILE_EXTENSION @"txt"
+    
+    // iCloud query support
+    NSMetadataQuery * _query;
+    BOOL _iCloudURLsReady;
+    NSMutableArray * _iCloudURLs;
+    
+    // CoreLocation support
     CLLocationManager* locationManager;
     CLLocation* currentLocation;
 }
@@ -102,7 +110,6 @@
 
 @property (strong) NSMetadataQuery *fileDownloadMonitorQuery;
 @property (strong, nonatomic) NSURL *documentURL;
-@property (strong, nonatomic) iCloudDocument *document;
 
 - (IBAction)takePicture:(id)sender;
 - (IBAction)switchCameras:(id)sender;

@@ -18,7 +18,6 @@
 		EB285CB7199FF0DA00C3DABD /* Settings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = EB285CB6199FF0DA00C3DABD /* Settings.bundle */; };
 		EB2D9E2919883075006B6C9B /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EB2D9E2819883075006B6C9B /* Accelerate.framework */; };
 		EB2D9E2B1988308B006B6C9B /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EB2D9E2A1988308B006B6C9B /* UIKit.framework */; };
-		EB47914D1995267D0040A901 /* iCloudDocument.m in Sources */ = {isa = PBXBuildFile; fileRef = EB47914C1995267D0040A901 /* iCloudDocument.m */; };
 		EB5AD3F219A55295004A1644 /* ccv2010.ntwk in Resources */ = {isa = PBXBuildFile; fileRef = EB5AD3F119A55295004A1644 /* ccv2010.ntwk */; };
 		EB5AD3F419A552A7004A1644 /* ccv2012.ntwk in Resources */ = {isa = PBXBuildFile; fileRef = EB5AD3F319A552A7004A1644 /* ccv2012.ntwk */; };
 		EB77021819D4CF3F005C0C95 /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EB77021719D4CF3F005C0C95 /* CoreLocation.framework */; };
@@ -43,8 +42,6 @@
 		EB285CB6199FF0DA00C3DABD /* Settings.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = Settings.bundle; sourceTree = SOURCE_ROOT; };
 		EB2D9E2819883075006B6C9B /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS8.0.sdk/System/Library/Frameworks/Accelerate.framework; sourceTree = DEVELOPER_DIR; };
 		EB2D9E2A1988308B006B6C9B /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS8.0.sdk/System/Library/Frameworks/UIKit.framework; sourceTree = DEVELOPER_DIR; };
-		EB47914C1995267D0040A901 /* iCloudDocument.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iCloudDocument.m; sourceTree = SOURCE_ROOT; };
-		EB47914E1995269B0040A901 /* iCloudDocument.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = iCloudDocument.h; sourceTree = SOURCE_ROOT; };
 		EB5AD3F119A55295004A1644 /* ccv2010.ntwk */ = {isa = PBXFileReference; lastKnownFileType = file; path = ccv2010.ntwk; sourceTree = SOURCE_ROOT; };
 		EB5AD3F319A552A7004A1644 /* ccv2012.ntwk */ = {isa = PBXFileReference; lastKnownFileType = file; path = ccv2012.ntwk; sourceTree = SOURCE_ROOT; };
 		EB77021719D4CF3F005C0C95 /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS8.0.sdk/System/Library/Frameworks/CoreLocation.framework; sourceTree = DEVELOPER_DIR; };
@@ -111,8 +108,6 @@
 				592FF92218EE240200C164F8 /* SquareCamAppDelegate.m */,
 				592FF92318EE240200C164F8 /* SquareCamViewController.h */,
 				592FF92418EE240200C164F8 /* SquareCamViewController.m */,
-				EB47914E1995269B0040A901 /* iCloudDocument.h */,
-				EB47914C1995267D0040A901 /* iCloudDocument.m */,
 				EBCCB67819885B09009831AA /* Images.xcassets */,
 				EBCCB67A19885D47009831AA /* Supporting Files */,
 			);
@@ -233,7 +228,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				EB47914D1995267D0040A901 /* iCloudDocument.m in Sources */,
 				592FF90218ECC66200C164F8 /* main.mm in Sources */,
 				592FF92618EE240200C164F8 /* SquareCamViewController.m in Sources */,
 				592FF92518EE240200C164F8 /* SquareCamAppDelegate.m in Sources */,
