@@ -68,29 +68,29 @@
         <!--Predictor View Controller-->
         <scene sceneID="UuV-83-kJf">
             <objects>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="4HL-75-h1S" userLabel="First Responder" sceneMemberID="firstResponder"/>
                 <tableViewController id="ADA-Tf-t4s" userLabel="Predictor View Controller" sceneMemberID="viewController">
-                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" id="4od-vb-u2B">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" id="2RK-JU-94Q">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <prototypes>
-                            <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" id="lp6-Mo-QPF">
+                            <tableViewCell contentMode="scaleToFill" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="predictor" id="T6H-7t-Fkp">
                                 <autoresizingMask key="autoresizingMask"/>
-                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="lp6-Mo-QPF" id="roi-ay-Sg3">
+                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="T6H-7t-Fkp" id="fjZ-4F-yvL">
                                     <autoresizingMask key="autoresizingMask"/>
                                 </tableViewCellContentView>
                             </tableViewCell>
                         </prototypes>
                         <connections>
-                            <outlet property="dataSource" destination="ADA-Tf-t4s" id="B5b-aq-jgX"/>
-                            <outlet property="delegate" destination="ADA-Tf-t4s" id="n8X-cQ-Ulw"/>
+                            <outlet property="dataSource" destination="ADA-Tf-t4s" id="8ok-Y0-pud"/>
+                            <outlet property="delegate" destination="ADA-Tf-t4s" id="MQB-IM-M9S"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" id="lSm-aW-qnx"/>
+                    <navigationItem key="navigationItem" title="iCloud Predictors" id="lSm-aW-qnx"/>
                 </tableViewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="4HL-75-h1S" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="533" y="137"/>
+            <point key="canvasLocation" x="534" y="137"/>
         </scene>
     </scenes>
     <simulatedMetricsContainer key="defaultSimulatedMetrics">
