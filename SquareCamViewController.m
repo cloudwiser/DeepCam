@@ -1141,7 +1141,7 @@ bail:
         
         // ...and move the new predictor file to iCloud
         __block BOOL success = NO;
-        writableDBPath = [@"file:///" stringByAppendingString:writableDBPath];  // Fix for iOS 8 iCloud Documents?
+        writableDBPath = [@"file:///" stringByAppendingString:writableDBPath];
         dispatch_async (dispatch_get_global_queue (DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
             NSURL *sourceURL = [NSURL URLWithString:writableDBPath];
             NSFileManager *fileManager = [[[NSFileManager alloc] init] autorelease];
@@ -1269,7 +1269,7 @@ bail:
     
     // ...if it does, move it to the local directory container
     __block BOOL wasMoved = NO;
-    writableDBPath = [@"file:///" stringByAppendingString:writableDBPath];  // Fix for iOS 8 iCloud Documents?
+    writableDBPath = [@"file:///" stringByAppendingString:writableDBPath];
     dispatch_async (dispatch_get_global_queue (DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
         NSURL *destURL = [NSURL URLWithString:writableDBPath];
         NSFileManager *fileManager = [[[NSFileManager alloc] init] autorelease];
