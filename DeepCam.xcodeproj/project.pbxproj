@@ -16,14 +16,14 @@
 		592FF92518EE240200C164F8 /* SquareCamAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 592FF92218EE240200C164F8 /* SquareCamAppDelegate.m */; };
 		592FF92618EE240200C164F8 /* SquareCamViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 592FF92418EE240200C164F8 /* SquareCamViewController.m */; };
 		EB285CB7199FF0DA00C3DABD /* Settings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = EB285CB6199FF0DA00C3DABD /* Settings.bundle */; };
-		EB2D9E2919883075006B6C9B /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EB2D9E2819883075006B6C9B /* Accelerate.framework */; };
-		EB2D9E2B1988308B006B6C9B /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EB2D9E2A1988308B006B6C9B /* UIKit.framework */; };
 		EB5AD3F219A55295004A1644 /* ccv2010.ntwk in Resources */ = {isa = PBXBuildFile; fileRef = EB5AD3F119A55295004A1644 /* ccv2010.ntwk */; };
 		EB5AD3F419A552A7004A1644 /* ccv2012.ntwk in Resources */ = {isa = PBXBuildFile; fileRef = EB5AD3F319A552A7004A1644 /* ccv2012.ntwk */; };
-		EB77021819D4CF3F005C0C95 /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EB77021719D4CF3F005C0C95 /* CoreLocation.framework */; };
 		EBCCB6731988580A009831AA /* DeepBelief.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EBCCB6721988580A009831AA /* DeepBelief.framework */; };
 		EBCCB67919885B09009831AA /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = EBCCB67819885B09009831AA /* Images.xcassets */; };
 		EBCCB67E198871B1009831AA /* wine_bottle_predictor.txt in Resources */ = {isa = PBXBuildFile; fileRef = EBCCB67D198871B1009831AA /* wine_bottle_predictor.txt */; };
+		EBECE5F21A2271A600ADF353 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EBECE5F11A2271A600ADF353 /* UIKit.framework */; };
+		EBECE5F41A2271C200ADF353 /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EBECE5F31A2271C200ADF353 /* CoreLocation.framework */; };
+		EBECE5F61A2271CA00ADF353 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EBECE5F51A2271CA00ADF353 /* Accelerate.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -40,16 +40,16 @@
 		592FF92318EE240200C164F8 /* SquareCamViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SquareCamViewController.h; sourceTree = SOURCE_ROOT; };
 		592FF92418EE240200C164F8 /* SquareCamViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SquareCamViewController.m; sourceTree = SOURCE_ROOT; };
 		EB285CB6199FF0DA00C3DABD /* Settings.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = Settings.bundle; sourceTree = SOURCE_ROOT; };
-		EB2D9E2819883075006B6C9B /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS8.0.sdk/System/Library/Frameworks/Accelerate.framework; sourceTree = DEVELOPER_DIR; };
-		EB2D9E2A1988308B006B6C9B /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS8.0.sdk/System/Library/Frameworks/UIKit.framework; sourceTree = DEVELOPER_DIR; };
 		EB5AD3F119A55295004A1644 /* ccv2010.ntwk */ = {isa = PBXFileReference; lastKnownFileType = file; path = ccv2010.ntwk; sourceTree = SOURCE_ROOT; };
 		EB5AD3F319A552A7004A1644 /* ccv2012.ntwk */ = {isa = PBXFileReference; lastKnownFileType = file; path = ccv2012.ntwk; sourceTree = SOURCE_ROOT; };
-		EB77021719D4CF3F005C0C95 /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS8.0.sdk/System/Library/Frameworks/CoreLocation.framework; sourceTree = DEVELOPER_DIR; };
 		EBB2337219887E87004A1218 /* DeepCam.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = DeepCam.entitlements; path = DeepCam/DeepCam.entitlements; sourceTree = SOURCE_ROOT; };
 		EBCCB6721988580A009831AA /* DeepBelief.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = DeepBelief.framework; path = "../DeepBeliefSDK-master/iOSLibrary/DeepBelief.framework"; sourceTree = "<group>"; };
 		EBCCB67619885AC3009831AA /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = SOURCE_ROOT; };
 		EBCCB67819885B09009831AA /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = DeepCam/Images.xcassets; sourceTree = SOURCE_ROOT; };
 		EBCCB67D198871B1009831AA /* wine_bottle_predictor.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = wine_bottle_predictor.txt; sourceTree = SOURCE_ROOT; };
+		EBECE5F11A2271A600ADF353 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS8.2.sdk/System/Library/Frameworks/UIKit.framework; sourceTree = DEVELOPER_DIR; };
+		EBECE5F31A2271C200ADF353 /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS8.2.sdk/System/Library/Frameworks/CoreLocation.framework; sourceTree = DEVELOPER_DIR; };
+		EBECE5F51A2271CA00ADF353 /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS8.2.sdk/System/Library/Frameworks/Accelerate.framework; sourceTree = DEVELOPER_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -57,10 +57,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				EB77021819D4CF3F005C0C95 /* CoreLocation.framework in Frameworks */,
+				EBECE5F61A2271CA00ADF353 /* Accelerate.framework in Frameworks */,
+				EBECE5F41A2271C200ADF353 /* CoreLocation.framework in Frameworks */,
+				EBECE5F21A2271A600ADF353 /* UIKit.framework in Frameworks */,
 				EBCCB6731988580A009831AA /* DeepBelief.framework in Frameworks */,
-				EB2D9E2B1988308B006B6C9B /* UIKit.framework in Frameworks */,
-				EB2D9E2919883075006B6C9B /* Accelerate.framework in Frameworks */,
 				592FF8BB18ECBD7600C164F8 /* CoreGraphics.framework in Frameworks */,
 				592FF8B918ECBD7600C164F8 /* Foundation.framework in Frameworks */,
 			);
@@ -89,10 +89,10 @@
 		592FF8B718ECBD7600C164F8 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				EB77021719D4CF3F005C0C95 /* CoreLocation.framework */,
+				EBECE5F51A2271CA00ADF353 /* Accelerate.framework */,
+				EBECE5F31A2271C200ADF353 /* CoreLocation.framework */,
+				EBECE5F11A2271A600ADF353 /* UIKit.framework */,
 				EBCCB6721988580A009831AA /* DeepBelief.framework */,
-				EB2D9E2A1988308B006B6C9B /* UIKit.framework */,
-				EB2D9E2819883075006B6C9B /* Accelerate.framework */,
 				592FF8B818ECBD7600C164F8 /* Foundation.framework */,
 				592FF8BA18ECBD7600C164F8 /* CoreGraphics.framework */,
 			);

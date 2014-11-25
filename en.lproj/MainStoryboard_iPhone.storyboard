@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="6245" systemVersion="14A389" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" initialViewController="2">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="6221" systemVersion="14B25" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" initialViewController="2">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6238"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6213"/>
     </dependencies>
     <scenes>
         <!--Square Cam View Controller-->
@@ -15,43 +15,29 @@
                             <view contentMode="scaleToFill" id="12">
                                 <rect key="frame" x="0.0" y="0.0" width="320" height="522"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                <subviews>
-                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="iD8-yH-eWH">
-                                        <rect key="frame" x="0.0" y="481" width="270" height="33"/>
-                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                        <color key="backgroundColor" cocoaTouchSystemColor="darkTextColor"/>
-                                        <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="20"/>
-                                        <state key="normal" title="Start Learning">
-                                            <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                            <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                                        </state>
-                                        <connections>
-                                            <action selector="takePicture:" destination="2" eventType="touchUpInside" id="BTy-7E-XUS"/>
-                                        </connections>
-                                    </button>
-                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" id="0vT-bL-gVc">
-                                        <rect key="frame" x="278" y="481" width="42" height="33"/>
-                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                        <color key="backgroundColor" cocoaTouchSystemColor="darkTextColor"/>
-                                        <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="20"/>
-                                        <state key="normal" title="&gt;"/>
-                                        <connections>
-                                            <action selector="takePicture:" destination="2" eventType="touchUpInside" id="Yj2-ZQ-ZvD"/>
-                                            <segue destination="ADA-Tf-t4s" kind="push" identifier="CloudPredictors" id="rYi-Iz-7R8"/>
-                                        </connections>
-                                    </button>
-                                </subviews>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                                 <gestureRecognizers/>
                                 <connections>
                                     <outletCollection property="gestureRecognizers" destination="23" appends="YES" id="24"/>
                                 </connections>
                             </view>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="h9h-2J-Ccj">
+                                <rect key="frame" x="0.0" y="484" width="320" height="33"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <color key="backgroundColor" cocoaTouchSystemColor="darkTextColor"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="20"/>
+                                <state key="normal" title="Start Learning">
+                                    <color key="titleColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                </state>
+                                <connections>
+                                    <action selector="takePicture:" destination="2" eventType="touchUpInside" id="GNg-7l-3Zj"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" cocoaTouchSystemColor="darkTextColor"/>
                     </view>
                     <connections>
-                        <outlet property="mainButton" destination="iD8-yH-eWH" id="ptk-IS-8zZ"/>
+                        <outlet property="mainButton" destination="h9h-2J-Ccj" id="8gU-l0-PDT"/>
                         <outlet property="previewView" destination="12" id="13"/>
                     </connections>
                 </viewController>
@@ -64,33 +50,6 @@
                 </pinchGestureRecognizer>
             </objects>
             <point key="canvasLocation" x="82" y="137"/>
-        </scene>
-        <!--Predictor View Controller-->
-        <scene sceneID="UuV-83-kJf">
-            <objects>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="4HL-75-h1S" userLabel="First Responder" sceneMemberID="firstResponder"/>
-                <tableViewController id="ADA-Tf-t4s" userLabel="Predictor View Controller" sceneMemberID="viewController">
-                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" id="2RK-JU-94Q">
-                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                        <prototypes>
-                            <tableViewCell contentMode="scaleToFill" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="predictor" id="T6H-7t-Fkp">
-                                <autoresizingMask key="autoresizingMask"/>
-                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="T6H-7t-Fkp" id="fjZ-4F-yvL">
-                                    <autoresizingMask key="autoresizingMask"/>
-                                </tableViewCellContentView>
-                            </tableViewCell>
-                        </prototypes>
-                        <connections>
-                            <outlet property="dataSource" destination="ADA-Tf-t4s" id="8ok-Y0-pud"/>
-                            <outlet property="delegate" destination="ADA-Tf-t4s" id="MQB-IM-M9S"/>
-                        </connections>
-                    </tableView>
-                    <navigationItem key="navigationItem" title="iCloud Predictors" id="lSm-aW-qnx"/>
-                </tableViewController>
-            </objects>
-            <point key="canvasLocation" x="534" y="137"/>
         </scene>
     </scenes>
     <simulatedMetricsContainer key="defaultSimulatedMetrics">
