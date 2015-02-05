@@ -1088,7 +1088,9 @@ bail:
         UITextField* tagField = [alertView textFieldAtIndex:0];
         tagField.keyboardType = UIKeyboardTypeASCIICapable;
         
-        // TODO - strip out invalid characters for a filename from the tag?
+        // Strip out invalid characters for a filename from the tag
+        NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:@"[^a-zA-Z0-9_]+" options:0 error:nil];
+        tagField.text = [regex stringByReplacingMatchesInString:tagField.text options:0 range:NSMakeRange(0, tagField.text.length) withTemplate:@"-"];
         
         // Build the filename of the form: <tag>-<time>-<lat>-<long>.txt
         NSDate *time = [NSDate date];
