@@ -701,7 +701,8 @@ bail:
     labelLayers = [[NSMutableArray alloc] init];
     oldPredictionValues = [[NSMutableDictionary alloc] init];
 
-    // Create location, manager & start updating
+    // iCloud predictor file management init...
+    // ...create location, manager & start updating
     if (currentLocation == nil)
         currentLocation = [[CLLocation alloc] init];
     if (locationManager == nil)
@@ -1065,315 +1066,6 @@ bail:
     [self startPositiveLearning];
 }
 
-- (void) savePredictorAlert {
-    // Update the location
-    [locationManager startUpdatingLocation];
-    
-    // Prompt for tag word...
-    UIAlertView * tagAlertView =[[UIAlertView alloc ] initWithTitle:@"Predictor tag"
-                                                            message:@"Enter tag word for the predictor filename"
-                                                            delegate:self cancelButtonTitle:@"Done" otherButtonTitles: nil];
-    tagAlertView.alertViewStyle = UIAlertViewStylePlainTextInput;
-    UITextField *tagField = [tagAlertView textFieldAtIndex:0];
-    tagField.placeholder = @"tag";
-    [tagAlertView show];
-    
-    // ...and handle in the delegate below
-}
-
-- (void) alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
-    // Done button pressed...
-    if (buttonIndex == 0)
-    {
-        UITextField* tagField = [alertView textFieldAtIndex:0];
-        tagField.keyboardType = UIKeyboardTypeASCIICapable;
-        
-        // Strip out invalid characters for a filename from the tag
-        NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:@"[^a-zA-Z0-9_]+" options:0 error:nil];
-        tagField.text = [regex stringByReplacingMatchesInString:tagField.text options:0 range:NSMakeRange(0, tagField.text.length) withTemplate:@"-"];
-        
-        // Build the filename of the form: <tag>-<time>-<lat>-<long>.txt
-        NSDate *time = [NSDate date];
-        NSDateFormatter* df = [NSDateFormatter new];
-        
-        [df setDateFormat:@"dd-MM-yyyy-hh-mm-ss"];
-        NSString *timeString = [df stringFromDate:time];
-        NSString *fileName = [NSString stringWithFormat:@"%@-%@[%f][%f].%@",
-                              tagField.text, timeString,
-                              self.currentLocation.coordinate.latitude, self.currentLocation.coordinate.longitude,
-                              PRED_FILE_EXTENSION];
-        
-        // And save it to iCloud
-        [self savePredictorFileToCloud:predictor filename: fileName];
-    }
-}
-
-#pragma mark - iCloud save & delete handlers
-
-- (BOOL) savePredictorFileToCloud: (void *) predict filename: (NSString*) fileName {
-    // If we're connected to the console, warn the user before re-routing stderr
-    if (isatty(STDERR_FILENO)) {
-        NSLog(@"Predictor output will be re-directed to file");
-    }
-    
-    // get the local Documents directory path
-    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-    NSString *documentsDirectory = [paths objectAtIndex:0];
-    NSString *writableDBPath = [documentsDirectory stringByAppendingPathComponent:fileName];
-    
-    // redirect stderr (predictor's output) to this file
-    int savedStdErr = dup(STDERR_FILENO);
-    FILE *fp = freopen([writableDBPath cStringUsingEncoding:NSASCIIStringEncoding], "w", stderr);
-    
-    // output the predictor
-    jpcnn_print_predictor(predict);
-
-    // redirect stderr back to the original path
-    fflush(stderr);
-    dup2(savedStdErr, STDERR_FILENO);
-    close(savedStdErr);
-    
-    // new local file created?
-    if (fp != nil) {
-        // if so, tidy up...
-        fclose(fp);
-
-        // ...delete any existing file on iCloud
-        [self deleteCloudFile:fileName];
-        
-        // ...and move the new predictor file to iCloud
-        __block BOOL success = NO;
-        writableDBPath = [@"file:///" stringByAppendingString:writableDBPath];
-        dispatch_async (dispatch_get_global_queue (DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
-            NSURL *sourceURL = [NSURL URLWithString:writableDBPath];
-            NSFileManager *fileManager = [[[NSFileManager alloc] init] autorelease];
-            NSURL *destURL = [[fileManager URLForUbiquityContainerIdentifier:nil]
-                              URLByAppendingPathComponent:@"Documents" isDirectory:YES];
-            destURL = [destURL URLByAppendingPathComponent:fileName];
-            NSError *error = nil;
-            success = [fileManager setUbiquitous:YES itemAtURL:sourceURL destinationURL:destURL error:&error];
-            if (success) {
-                NSLog(@"%@ moved from local to iCloud", destURL);
-            } else {
-                NSLog(@"%@ move from local to iCloud failed : error = %@", destURL, error);
-            }
-        });
-        return success;
-    } else {
-        NSLog(@"Write failed : fp = %@", fp);
-        return NO;
-    }
-}
-
-- (void)deleteCloudFile:(NSString *)fileName {
-    // Setup the path to delete from
-    NSFileManager *fileManager = [[[NSFileManager alloc] init] autorelease];
-    NSURL *deleteURL = [[fileManager URLForUbiquityContainerIdentifier:nil]
-                        URLByAppendingPathComponent:@"Documents" isDirectory:YES];
-    deleteURL = [deleteURL URLByAppendingPathComponent:fileName];
-    
-    // Wrap in file coordinator
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
-        NSFileCoordinator* fileCoordinator = [[NSFileCoordinator alloc] initWithFilePresenter:nil];
-        [fileCoordinator coordinateWritingItemAtURL:deleteURL
-                                            options:NSFileCoordinatorWritingForDeleting
-                                              error:nil
-                                         byAccessor:^(NSURL* writingURL) {
-                                             // Simple delete to start
-                                             [fileManager removeItemAtURL:deleteURL error:nil];
-                                         }];
-    });
-}
-
-
-#pragma mark - TODO : iCloud directory query handler
-
-- (NSMetadataQuery *)documentQuery {
-    NSMetadataQuery * query = [[NSMetadataQuery alloc] init];
-    if (query) {
-        
-        // Search documents subdir only
-        [query setSearchScopes:[NSArray arrayWithObject:NSMetadataQueryUbiquitousDocumentsScope]];
-        
-        // Add a predicate for finding the documents
-        NSString * filePattern = [NSString stringWithFormat:@"*.%@", PRED_FILE_EXTENSION];
-        [query setPredicate:[NSPredicate predicateWithFormat:@"%K LIKE %@",
-                             NSMetadataItemFSNameKey, filePattern]];
-        
-    }
-    return query;
-}
-
-- (void)stopQuery {
-    if (_query) {
-        NSLog(@"No longer watching iCloud dir...");
-        
-        [[NSNotificationCenter defaultCenter] removeObserver:self name:NSMetadataQueryDidFinishGatheringNotification object:nil];
-        [[NSNotificationCenter defaultCenter] removeObserver:self name:NSMetadataQueryDidUpdateNotification object:nil];
-        [_query stopQuery];
-        _query = nil;
-    }
-}
-
-- (void)startQuery {
-    [self stopQuery];
-    NSLog(@"Starting to watch iCloud dir...");
-    _query = [self documentQuery];
-    
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(processiCloudFiles:)
-                                                 name:NSMetadataQueryDidFinishGatheringNotification
-                                               object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(processiCloudFiles:)
-                                                 name:NSMetadataQueryDidUpdateNotification
-                                               object:nil];
-    [_query startQuery];
-}
-
-- (void)processiCloudFiles:(NSNotification *)notification {
-    
-    // Always disable updates while processing results
-    [_query disableUpdates];
-    
-    [_iCloudURLs removeAllObjects];
-    
-    // The query reports all files found, every time.
-    NSArray * queryResults = [_query results];
-    for (NSMetadataItem * result in queryResults) {
-        NSURL * fileURL = [result valueForAttribute:NSMetadataItemURLKey];
-        NSNumber * aBool = nil;
-        
-        // Don't include hidden files
-        [fileURL getResourceValue:&aBool forKey:NSURLIsHiddenKey error:nil];
-        if (aBool && ![aBool boolValue]) {
-            [_iCloudURLs addObject:fileURL];
-        }
-        
-    }
-    
-    NSLog(@"Found %lu iCloud files.", (unsigned long)_iCloudURLs.count);
-    _iCloudURLsReady = YES;
-    
-    [_query enableUpdates];
-}
-
-
-#pragma mark - TODO : iCloud read handlers
-
-- (BOOL) loadPredictorFileFromCloud: (NSString*) fileName {
-    // get the local Documents directory path
-    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-    NSString *documentsDirectory = [paths objectAtIndex:0];
-    NSString *writableDBPath = [documentsDirectory stringByAppendingPathComponent:fileName];
-    
-    //TODO : check that the iCloud-hosted file exists first...
-    
-    // ...if it does, move it to the local directory container
-    __block BOOL wasMoved = NO;
-    writableDBPath = [@"file:///" stringByAppendingString:writableDBPath];
-    dispatch_async (dispatch_get_global_queue (DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
-        NSURL *destURL = [NSURL URLWithString:writableDBPath];
-        NSFileManager *fileManager = [[[NSFileManager alloc] init] autorelease];
-        NSURL *sourceURL = [[fileManager URLForUbiquityContainerIdentifier:nil]
-                            URLByAppendingPathComponent:@"Documents" isDirectory:YES];
-        sourceURL = [sourceURL URLByAppendingPathComponent:fileName];
-        NSError *error = nil;
-        BOOL success = [fileManager setUbiquitous:NO itemAtURL:sourceURL destinationURL:destURL error:&error];
-        if (success) {
-            NSLog(@"%@ moved from iCloud to local", destURL);
-            
-            // now load the predictor from the local file
-            predictor = jpcnn_load_predictor([writableDBPath UTF8String]);
-            assert(predictor != NULL);
-            
-        } else {
-            NSLog(@"%@ move from iCloud to local failed : error = %@", destURL, error);
-        }
-        wasMoved = success;
-    });
-    return wasMoved;
-}
-
-- (void)downloadPredictorFileFromCloud:(NSURL *)url
-{
-    dispatch_queue_t q_default;
-    q_default = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
-    dispatch_async(q_default, ^{
-        
-        NSError *error = nil;
-        BOOL success = [[NSFileManager defaultManager] startDownloadingUbiquitousItemAtURL:url error:&error];
-        if (!success)
-        {
-            NSLog(@"Download to local for file: %@ : failed - error: %@", url, error);
-        }
-        else
-        {
-            NSDictionary *attrs = [url resourceValuesForKeys:@[NSURLUbiquitousItemDownloadingStatusKey] error:&error];
-            if (attrs != nil)
-            {
-                if ([[attrs objectForKey:NSURLUbiquitousItemDownloadingStatusKey] boolValue])
-                {
-                    NSLog(@"Already downloaded file: %@", url);
-                }
-                else
-                {
-                    NSMetadataQuery *query = [[NSMetadataQuery alloc] init];
-                    [query setPredicate:[NSPredicate predicateWithFormat:@"%K > 0", NSMetadataUbiquitousItemPercentDownloadedKey]];
-                    [query setSearchScopes:@[url]]; // scope the search only on this item
-                    
-                    [query setValueListAttributes:@[NSMetadataUbiquitousItemPercentDownloadedKey, NSURLUbiquitousItemDownloadingStatusKey]];
-                    
-                    _fileDownloadMonitorQuery = query;
-                    
-                    [[NSNotificationCenter defaultCenter] addObserver:self
-                                                             selector:@selector(liveUpdate:)
-                                                                 name:NSMetadataQueryDidUpdateNotification
-                                                               object:query];
-                    
-                    [self.fileDownloadMonitorQuery startQuery];
-                }
-            }
-        }
-    });
-}
-
-- (void)liveUpdate:(NSNotification *)notification
-{
-    NSMetadataQuery *query = [notification object];
-    
-    if (query != self.fileDownloadMonitorQuery)
-        return; // it's not our query
-    
-    if ([self.fileDownloadMonitorQuery resultCount] == 0)
-        return; // no items found
-    
-    NSMetadataItem *item = [self.fileDownloadMonitorQuery resultAtIndex:0];
-    double progress = [[item valueForAttribute:NSMetadataUbiquitousItemPercentDownloadedKey] doubleValue];
-    NSLog(@"Download progress = %f", progress);
-    
-    // report download progress somehow..
-    
-    if ([[item valueForAttribute:NSURLUbiquitousItemDownloadingStatusKey] boolValue])
-    {
-        // finished downloading, stop the query
-        [query stopQuery];
-        _fileDownloadMonitorQuery = nil;
-    }
-}
-
-
-#pragma mark - Location Manager delegate
-
-- (void)locationManager:(CLLocationManager *)manager didUpdateToLocation:(CLLocation *)newLocation fromLocation:(CLLocation *)oldLocation
-{
-    self.currentLocation = newLocation;
-    [manager stopUpdatingLocation];
-    
-    NSLog(@"latitude: %f", self.currentLocation.coordinate.latitude);
-    NSLog(@"longitude: %f", self.currentLocation.coordinate.longitude);
-}
-
 
 #pragma mark - DeepBelief predictor info display
 
@@ -1575,6 +1267,332 @@ bail:
     utterance.rate = 0.50 * AVSpeechUtteranceDefaultSpeechRate;
     [synth speakUtterance:utterance];
 }
+
+// ===================================================================================
+//
+// iCloud predictor file read/write/query methods
+//
+// Added by Nick Hall
+// 5th February 2015
+//
+// ====================================================================================
+
+
+- (void) savePredictorAlert {
+    // Update the location
+    [locationManager startUpdatingLocation];
+    
+    // Prompt for tag word...
+    UIAlertView * tagAlertView =[[UIAlertView alloc ] initWithTitle:@"Predictor tag"
+                                                            message:@"Enter tag word for the predictor filename"
+                                                            delegate:self cancelButtonTitle:@"Done" otherButtonTitles: nil];
+    tagAlertView.alertViewStyle = UIAlertViewStylePlainTextInput;
+    UITextField *tagField = [tagAlertView textFieldAtIndex:0];
+    tagField.placeholder = @"tag";
+    [tagAlertView show];
+    
+    // ...and handle in the delegate below
+}
+
+- (void) alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
+    // Done button pressed...
+    if (buttonIndex == 0)
+    {
+        UITextField* tagField = [alertView textFieldAtIndex:0];
+        tagField.keyboardType = UIKeyboardTypeASCIICapable;
+        
+        // Strip out invalid characters for a filename from the tag
+        NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:@"[^a-zA-Z0-9_]+" options:0 error:nil];
+        tagField.text = [regex stringByReplacingMatchesInString:tagField.text options:0 range:NSMakeRange(0, tagField.text.length) withTemplate:@"-"];
+        
+        // Build the filename of the form: <tag>-<time>-<lat>-<long>.txt
+        NSDate *time = [NSDate date];
+        NSDateFormatter* df = [NSDateFormatter new];
+        
+        [df setDateFormat:@"dd-MM-yyyy-hh-mm-ss"];
+        NSString *timeString = [df stringFromDate:time];
+        NSString *fileName = [NSString stringWithFormat:@"%@-%@[%f][%f].%@",
+                              tagField.text, timeString,
+                              self.currentLocation.coordinate.latitude, self.currentLocation.coordinate.longitude,
+                              PRED_FILE_EXTENSION];
+        
+        // And save it to iCloud
+        [self savePredictorFileToCloud:predictor filename: fileName];
+    }
+}
+
+
+#pragma mark - Location Manager delegate
+
+- (void)locationManager:(CLLocationManager *)manager didUpdateToLocation:(CLLocation *)newLocation fromLocation:(CLLocation *)oldLocation
+{
+    self.currentLocation = newLocation;
+    [manager stopUpdatingLocation];
+    
+    NSLog(@"latitude: %f", self.currentLocation.coordinate.latitude);
+    NSLog(@"longitude: %f", self.currentLocation.coordinate.longitude);
+}
+
+
+#pragma mark - iCloud save & delete handlers
+
+- (BOOL) savePredictorFileToCloud: (void *) predict filename: (NSString*) fileName {
+    // If we're connected to the console, warn the user before re-routing stderr
+    if (isatty(STDERR_FILENO)) {
+        NSLog(@"Predictor output will be re-directed to file");
+    }
+    
+    // get the local Documents directory path
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *documentsDirectory = [paths objectAtIndex:0];
+    NSString *writableDBPath = [documentsDirectory stringByAppendingPathComponent:fileName];
+    
+    // redirect stderr (predictor's output) to this file
+    int savedStdErr = dup(STDERR_FILENO);
+    FILE *fp = freopen([writableDBPath cStringUsingEncoding:NSASCIIStringEncoding], "w", stderr);
+    
+    // output the predictor
+    jpcnn_print_predictor(predict);
+
+    // redirect stderr back to the original path
+    fflush(stderr);
+    dup2(savedStdErr, STDERR_FILENO);
+    close(savedStdErr);
+    
+    // new local file created?
+    if (fp != nil) {
+        // if so, tidy up...
+        fclose(fp);
+
+        // ...delete any existing file on iCloud
+        [self deleteCloudFile:fileName];
+        
+        // ...and move the new predictor file to iCloud
+        __block BOOL success = NO;
+        writableDBPath = [@"file:///" stringByAppendingString:writableDBPath];
+        dispatch_async (dispatch_get_global_queue (DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
+            NSURL *sourceURL = [NSURL URLWithString:writableDBPath];
+            NSFileManager *fileManager = [[[NSFileManager alloc] init] autorelease];
+            NSURL *destURL = [[fileManager URLForUbiquityContainerIdentifier:nil]
+                              URLByAppendingPathComponent:@"Documents" isDirectory:YES];
+            destURL = [destURL URLByAppendingPathComponent:fileName];
+            NSError *error = nil;
+            success = [fileManager setUbiquitous:YES itemAtURL:sourceURL destinationURL:destURL error:&error];
+            if (success) {
+                NSLog(@"%@ moved from local to iCloud", destURL);
+            } else {
+                NSLog(@"%@ move from local to iCloud failed : error = %@", destURL, error);
+            }
+        });
+        return success;
+    } else {
+        NSLog(@"Write failed : fp = %@", fp);
+        return NO;
+    }
+}
+
+- (void)deleteCloudFile:(NSString *)fileName {
+    // Setup the path to delete from
+    NSFileManager *fileManager = [[[NSFileManager alloc] init] autorelease];
+    NSURL *deleteURL = [[fileManager URLForUbiquityContainerIdentifier:nil]
+                        URLByAppendingPathComponent:@"Documents" isDirectory:YES];
+    deleteURL = [deleteURL URLByAppendingPathComponent:fileName];
+    
+    // Wrap in file coordinator
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
+        NSFileCoordinator* fileCoordinator = [[NSFileCoordinator alloc] initWithFilePresenter:nil];
+        [fileCoordinator coordinateWritingItemAtURL:deleteURL
+                                            options:NSFileCoordinatorWritingForDeleting
+                                              error:nil
+                                         byAccessor:^(NSURL* writingURL) {
+                                             // Simple delete to start
+                                             [fileManager removeItemAtURL:deleteURL error:nil];
+                                         }];
+    });
+}
+
+// ------------------------------------------------------------------------------------
+//
+// TODO : implement or delete iCloud file reading methods from here onwards...
+//
+// ------------------------------------------------------------------------------------
+
+#pragma mark - TODO : iCloud directory query handler
+
+- (NSMetadataQuery *)documentQuery {
+    NSMetadataQuery * query = [[NSMetadataQuery alloc] init];
+    if (query) {
+        
+        // Search documents subdir only
+        [query setSearchScopes:[NSArray arrayWithObject:NSMetadataQueryUbiquitousDocumentsScope]];
+        
+        // Add a predicate for finding the documents
+        NSString * filePattern = [NSString stringWithFormat:@"*.%@", PRED_FILE_EXTENSION];
+        [query setPredicate:[NSPredicate predicateWithFormat:@"%K LIKE %@",
+                             NSMetadataItemFSNameKey, filePattern]];
+        
+    }
+    return query;
+}
+
+- (void)stopQuery {
+    if (_query) {
+        NSLog(@"No longer watching iCloud dir...");
+        
+        [[NSNotificationCenter defaultCenter] removeObserver:self name:NSMetadataQueryDidFinishGatheringNotification object:nil];
+        [[NSNotificationCenter defaultCenter] removeObserver:self name:NSMetadataQueryDidUpdateNotification object:nil];
+        [_query stopQuery];
+        _query = nil;
+    }
+}
+
+- (void)startQuery {
+    [self stopQuery];
+    NSLog(@"Starting to watch iCloud dir...");
+    _query = [self documentQuery];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(processiCloudFiles:)
+                                                 name:NSMetadataQueryDidFinishGatheringNotification
+                                               object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(processiCloudFiles:)
+                                                 name:NSMetadataQueryDidUpdateNotification
+                                               object:nil];
+    [_query startQuery];
+}
+
+- (void)processiCloudFiles:(NSNotification *)notification {
+    
+    // Always disable updates while processing results
+    [_query disableUpdates];
+    
+    [_iCloudURLs removeAllObjects];
+    
+    // The query reports all files found, every time.
+    NSArray * queryResults = [_query results];
+    for (NSMetadataItem * result in queryResults) {
+        NSURL * fileURL = [result valueForAttribute:NSMetadataItemURLKey];
+        NSNumber * aBool = nil;
+        
+        // Don't include hidden files
+        [fileURL getResourceValue:&aBool forKey:NSURLIsHiddenKey error:nil];
+        if (aBool && ![aBool boolValue]) {
+            [_iCloudURLs addObject:fileURL];
+        }
+        
+    }
+    
+    NSLog(@"Found %lu iCloud files.", (unsigned long)_iCloudURLs.count);
+    _iCloudURLsReady = YES;
+    
+    [_query enableUpdates];
+}
+
+
+#pragma mark - TODO : iCloud read handlers
+
+- (BOOL) loadPredictorFileFromCloud: (NSString*) fileName {
+    // get the local Documents directory path
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *documentsDirectory = [paths objectAtIndex:0];
+    NSString *writableDBPath = [documentsDirectory stringByAppendingPathComponent:fileName];
+    
+    //TODO : check that the iCloud-hosted file exists first...
+    
+    // ...if it does, move it to the local directory container
+    __block BOOL wasMoved = NO;
+    writableDBPath = [@"file:///" stringByAppendingString:writableDBPath];
+    dispatch_async (dispatch_get_global_queue (DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
+        NSURL *destURL = [NSURL URLWithString:writableDBPath];
+        NSFileManager *fileManager = [[[NSFileManager alloc] init] autorelease];
+        NSURL *sourceURL = [[fileManager URLForUbiquityContainerIdentifier:nil]
+                            URLByAppendingPathComponent:@"Documents" isDirectory:YES];
+        sourceURL = [sourceURL URLByAppendingPathComponent:fileName];
+        NSError *error = nil;
+        BOOL success = [fileManager setUbiquitous:NO itemAtURL:sourceURL destinationURL:destURL error:&error];
+        if (success) {
+            NSLog(@"%@ moved from iCloud to local", destURL);
+            
+            // now load the predictor from the local file
+            predictor = jpcnn_load_predictor([writableDBPath UTF8String]);
+            assert(predictor != NULL);
+            
+        } else {
+            NSLog(@"%@ move from iCloud to local failed : error = %@", destURL, error);
+        }
+        wasMoved = success;
+    });
+    return wasMoved;
+}
+
+- (void)downloadPredictorFileFromCloud:(NSURL *)url
+{
+    dispatch_queue_t q_default;
+    q_default = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+    dispatch_async(q_default, ^{
+        
+        NSError *error = nil;
+        BOOL success = [[NSFileManager defaultManager] startDownloadingUbiquitousItemAtURL:url error:&error];
+        if (!success)
+        {
+            NSLog(@"Download to local for file: %@ : failed - error: %@", url, error);
+        }
+        else
+        {
+            NSDictionary *attrs = [url resourceValuesForKeys:@[NSURLUbiquitousItemDownloadingStatusKey] error:&error];
+            if (attrs != nil)
+            {
+                if ([[attrs objectForKey:NSURLUbiquitousItemDownloadingStatusKey] boolValue])
+                {
+                    NSLog(@"Already downloaded file: %@", url);
+                }
+                else
+                {
+                    NSMetadataQuery *query = [[NSMetadataQuery alloc] init];
+                    [query setPredicate:[NSPredicate predicateWithFormat:@"%K > 0", NSMetadataUbiquitousItemPercentDownloadedKey]];
+                    [query setSearchScopes:@[url]]; // scope the search only on this item
+                    
+                    [query setValueListAttributes:@[NSMetadataUbiquitousItemPercentDownloadedKey, NSURLUbiquitousItemDownloadingStatusKey]];
+                    
+                    _fileDownloadMonitorQuery = query;
+                    
+                    [[NSNotificationCenter defaultCenter] addObserver:self
+                                                             selector:@selector(liveUpdate:)
+                                                                 name:NSMetadataQueryDidUpdateNotification
+                                                               object:query];
+                    
+                    [self.fileDownloadMonitorQuery startQuery];
+                }
+            }
+        }
+    });
+}
+
+- (void)liveUpdate:(NSNotification *)notification
+{
+    NSMetadataQuery *query = [notification object];
+    
+    if (query != self.fileDownloadMonitorQuery)
+        return; // it's not our query
+    
+    if ([self.fileDownloadMonitorQuery resultCount] == 0)
+        return; // no items found
+    
+    NSMetadataItem *item = [self.fileDownloadMonitorQuery resultAtIndex:0];
+    double progress = [[item valueForAttribute:NSMetadataUbiquitousItemPercentDownloadedKey] doubleValue];
+    NSLog(@"Download progress = %f", progress);
+    
+    // report download progress somehow..
+    
+    if ([[item valueForAttribute:NSURLUbiquitousItemDownloadingStatusKey] boolValue])
+    {
+        // finished downloading, stop the query
+        [query stopQuery];
+        _fileDownloadMonitorQuery = nil;
+    }
+}
+
 
 
 @end
