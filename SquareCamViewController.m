@@ -1044,6 +1044,8 @@ bail:
     }
     predictor = jpcnn_create_predictor_from_trainer(trainer);
     
+    [self savePredictorAlert];
+    
     predictionState = ePredicting;
     
     [self updateInfoDisplay];
