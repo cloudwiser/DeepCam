@@ -24,6 +24,7 @@
 		EBCCB6731988580A009831AA /* DeepBelief.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EBCCB6721988580A009831AA /* DeepBelief.framework */; };
 		EBCCB67919885B09009831AA /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = EBCCB67819885B09009831AA /* Images.xcassets */; };
 		EBCCB67E198871B1009831AA /* wine_bottle_predictor.txt in Resources */ = {isa = PBXBuildFile; fileRef = EBCCB67D198871B1009831AA /* wine_bottle_predictor.txt */; };
+		EBEB4E9C1BC6C1C0000DD7C4 /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EBEB4E9B1BC6C1C0000DD7C4 /* CloudKit.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -50,6 +51,7 @@
 		EBCCB67619885AC3009831AA /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = SOURCE_ROOT; };
 		EBCCB67819885B09009831AA /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = DeepCam/Images.xcassets; sourceTree = SOURCE_ROOT; };
 		EBCCB67D198871B1009831AA /* wine_bottle_predictor.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = wine_bottle_predictor.txt; sourceTree = SOURCE_ROOT; };
+		EBEB4E9B1BC6C1C0000DD7C4 /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS9.0.sdk/System/Library/Frameworks/CloudKit.framework; sourceTree = DEVELOPER_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -57,6 +59,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EBEB4E9C1BC6C1C0000DD7C4 /* CloudKit.framework in Frameworks */,
 				EB3D71591BC3BC8E00B66118 /* CoreLocation.framework in Frameworks */,
 				EB3D71571BC3BC8100B66118 /* UIKit.framework in Frameworks */,
 				EB3D71551BC3BC6E00B66118 /* Accelerate.framework in Frameworks */,
@@ -72,6 +75,7 @@
 		592FF8AA18ECBD3600C164F8 = {
 			isa = PBXGroup;
 			children = (
+				592FF90718EDD0DA00C164F8 /* en.lproj */,
 				592FF8BE18ECBD7600C164F8 /* DeepCam */,
 				592FF8B718ECBD7600C164F8 /* Frameworks */,
 				592FF8B618ECBD7600C164F8 /* Products */,
@@ -89,6 +93,7 @@
 		592FF8B718ECBD7600C164F8 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				EBEB4E9B1BC6C1C0000DD7C4 /* CloudKit.framework */,
 				EB3D71581BC3BC8E00B66118 /* CoreLocation.framework */,
 				EB3D71561BC3BC8100B66118 /* UIKit.framework */,
 				EB3D71541BC3BC6E00B66118 /* Accelerate.framework */,
@@ -102,7 +107,6 @@
 		592FF8BE18ECBD7600C164F8 /* DeepCam */ = {
 			isa = PBXGroup;
 			children = (
-				592FF90718EDD0DA00C164F8 /* en.lproj */,
 				592FF90118ECC66200C164F8 /* main.mm */,
 				592FF92118EE240200C164F8 /* SquareCamAppDelegate.h */,
 				592FF92218EE240200C164F8 /* SquareCamAppDelegate.m */,
@@ -291,10 +295,11 @@
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_ENTITLEMENTS = DeepCam/DeepCam.entitlements;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "iPhone Developer: Nick Hall (382VA8AYYC)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Nick Hall (382VA8AYYC)";
 				COPY_PHASE_STRIP = NO;
 				DEFINES_MODULE = YES;
+				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(DEVELOPER_FRAMEWORKS_DIR)",
@@ -324,10 +329,10 @@
 				"OTHER_LDFLAGS[arch=*]" = "-ObjC";
 				PRODUCT_BUNDLE_IDENTIFIER = "co.cloudwise.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = DeepCam;
-				PROVISIONING_PROFILE = "989dda48-e36d-4209-be7d-79f20affe357";
+				PROVISIONING_PROFILE = "d1d4fd3d-0730-40cc-bfe4-81d43bffcd21";
 				SDKROOT = iphoneos;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 				VALID_ARCHS = "arm64 armv7 armv7s";
 				WRAPPER_EXTENSION = app;
 			};
@@ -352,10 +357,11 @@
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_ENTITLEMENTS = DeepCam/DeepCam.entitlements;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "iPhone Developer: Nick Hall (382VA8AYYC)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Nick Hall (382VA8AYYC)";
 				COPY_PHASE_STRIP = YES;
 				DEFINES_MODULE = YES;
+				ENABLE_BITCODE = NO;
 				ENABLE_NS_ASSERTIONS = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -379,9 +385,9 @@
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_BUNDLE_IDENTIFIER = "co.cloudwise.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = DeepCam;
-				PROVISIONING_PROFILE = "989dda48-e36d-4209-be7d-79f20affe357";
+				PROVISIONING_PROFILE = "d1d4fd3d-0730-40cc-bfe4-81d43bffcd21";
 				SDKROOT = iphoneos;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 				VALIDATE_PRODUCT = YES;
 				VALID_ARCHS = "arm64 armv7 armv7s";
 				WRAPPER_EXTENSION = app;

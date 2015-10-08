@@ -52,6 +52,10 @@
 #import <AssetsLibrary/AssetsLibrary.h>
 #include <sys/time.h>
 
+#include <CloudKit/CKRecord.h>
+#include <CloudKit/CKContainer.h>
+#include <CloudKit/CKDatabase.h>
+
 #import "DeepBelief/DeepBelief.h"
 
 #pragma mark-
@@ -969,17 +973,6 @@ bail:
     predictor = NULL;
     predictionState = eWaiting;
     
-    // Asynchronous nature of iCloud downloads means this fails!
-    // I suspect we need to run on the main thread and wait...or use the downloadPredictorFile function that adds an observer on the copy...?
-//    if ([self loadPredictorFileFromCloud: kcloudFilename]) {
-//        
-//        // Start predicting
-//        predictionState = ePredicting;
-//        self.lastFrameTime = [NSDate date];
-//    }
-//    else
-//        NSLog(@"loadPredictorFileFromCloud failed");
-
     lastInfo = NULL;
     
     [self setupInfoDisplay];
@@ -1321,9 +1314,76 @@ bail:
                               PRED_FILE_EXTENSION];
         
         // And save it to iCloud
-        [self savePredictorFileToCloud:predictor filename: fileName];
+        // [self savePredictorFileToCloud:predictor filename: fileName];
+
+        // get the local Documents directory path
+        NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+        NSString *documentsDirectory = [paths objectAtIndex:0];
+        NSString *writablePath = [documentsDirectory stringByAppendingPathComponent:fileName];
+        NSURL *writablePathURL = [NSURL fileURLWithPath:writablePath isDirectory:false];
+        // TODO - handle user not being signed in to iCloud...or having an iCloud account
+        
+        // Create the predictor file and save to iCloud
+        if ([self createPredictorFile:predictor filename:writablePath] == true) {
+            
+            CKRecord* myRecord = [[CKRecord alloc] initWithRecordType:@"Predictors"];
+        
+            // Set up the records
+            myRecord[@"Location"] = self.currentLocation;
+            myRecord[@"Tag"] = tagField.text;
+            myRecord[@"Timestamp"] = timeString;
+            
+            CKAsset* predictorAsset = [[CKAsset alloc] initWithFileURL: writablePathURL];
+            myRecord[@"PredictorFile"] = predictorAsset;
+        
+            // Setup access to private database
+            CKContainer *myContainer = [CKContainer defaultContainer];
+            CKDatabase *privateDatabase = [myContainer privateCloudDatabase];
+            
+            // Save the record to the private database
+            [privateDatabase saveRecord:myRecord completionHandler:^(CKRecord *myRecord, NSError *error){
+                if (!error) {
+                    NSLog(@"Predictor saved to iCloud");
+                }
+                else {
+                    NSLog(@"Predictor NOT saved to iCloud");
+                }
+            }];
+        }
+     }
+}
+
+#pragma mark - predictor file method
+
+- (BOOL) createPredictorFile: (void *) predict filename: (NSString*) writableDBPath {
+    // If we're connected to the console, warn the user before re-routing stderr
+    if (isatty(STDERR_FILENO)) {
+        NSLog(@"Predictor output will be re-directed to file");
+    }
+    
+    // redirect stderr (predictor's output) to this file
+    int savedStdErr = dup(STDERR_FILENO);
+    FILE *fp = freopen([writableDBPath cStringUsingEncoding:NSASCIIStringEncoding], "w", stderr);
+    
+    // output the predictor
+    jpcnn_print_predictor(predict);
+    
+    // redirect stderr back to the original path
+    fflush(stderr);
+    dup2(savedStdErr, STDERR_FILENO);
+    close(savedStdErr);
+    
+    // new local file created?
+    if (fp != nil) {
+        // if so, tidy up...
+        fclose(fp);
+        return YES;
+    } else {
+        NSLog(@"Write failed : fp = %@", fp);
+        return NO;
     }
 }
+
 
 #pragma mark - iCloud save & delete handlers
 
