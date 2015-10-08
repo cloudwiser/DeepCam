@@ -46,7 +46,7 @@
  */
 
 #import <UIKit/UIKit.h>
-#import "iCloudDocument.h"
+
 
 @interface SquareCamAppDelegate : UIResponder <UIApplicationDelegate>
 

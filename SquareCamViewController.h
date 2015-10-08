@@ -107,7 +107,6 @@
 @property (retain, nonatomic) NSDate *lastFrameTime;
 
 @property (retain, nonatomic) CLLocation *currentLocation;
-
 @property (strong) NSMetadataQuery *fileDownloadMonitorQuery;
 @property (strong, nonatomic) NSURL *documentURL;
 
